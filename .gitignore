@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.rsuser
+*.cache
+transactions_*.json
+transactions_*.xml
