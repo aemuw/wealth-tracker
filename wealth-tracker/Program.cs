@@ -1,5 +1,6 @@
 using wealth_tracker;
 using wealth_tracker.Presenter;
+using wealth_tracker.Services;
 
 namespace wealth_tracker
 {
@@ -9,7 +10,14 @@ namespace wealth_tracker
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new WealthTracker());
+
+            var service = new TransactionService();
+            var persistence = new PersistenceService(default);
+            var form = new WealthTracker();
+            var presenter = new WealthPresenter(form, service, persistence);
+            form.SetPresenter(presenter);
+
+            Application.Run(form);
         }
     }
 }

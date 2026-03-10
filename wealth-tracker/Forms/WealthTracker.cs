@@ -37,20 +37,20 @@ namespace wealth_tracker
             InitializeComponent();
         }
 
+        public void SetPresenter(WealthPresenter presenter)
+        {
+            _presenter = presenter;
+        }
+
         private void WealthTracker_Load(object sender, EventArgs e)
         {
             this.Text = "WealthTracker";
-
-            var service     = new TransactionService();
-            var persistence = new PersistenceService("default");
-            _presenter = new WealthPresenter(this, service, persistence);
-
             InitializeDataGrid();
             InitializePieChart();
             InitializeLineChart();
             InitializeCategoryComboBox();
 
-            _presenter.Initialize();
+            _presenter?.Initialize();
         }
 
         public void ShowSummary(WealthSummary summary)
