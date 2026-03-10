@@ -18,6 +18,8 @@ namespace wealth_tracker.Presenter
         void ShowError(string message);
         void ShowSuccess(string message);
 
+        string? AskSaveFilePath(string filter, string defaultFileName);
+
         void ClearAddForm();
 
         event EventHandler<Transaction> TransactionAddRequested;

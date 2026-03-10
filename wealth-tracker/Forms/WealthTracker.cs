@@ -42,7 +42,7 @@ namespace wealth_tracker
             _presenter = presenter;
         }
 
-        private void WealthTracker_Load(object sender, EventArgs e)
+        private async void WealthTracker_Load(object sender, EventArgs e)
         {
             this.Text = "WealthTracker";
             InitializeDataGrid();
@@ -50,7 +50,7 @@ namespace wealth_tracker
             InitializeLineChart();
             InitializeCategoryComboBox();
 
-            _presenter?.Initialize();
+            await _presenter!.InitializeAsync();
         }
 
         public void ShowSummary(WealthSummary summary)
