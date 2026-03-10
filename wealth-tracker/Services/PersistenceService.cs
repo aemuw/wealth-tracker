@@ -41,8 +41,14 @@ namespace wealth_tracker.Services
                 var json = File.ReadAllText(_jsonPath);
                 return JsonSerializer.Deserialize<List<Transaction>>(json, _jsonOptions) ?? new List<Transaction>();
             }
-            catch
+            catch (JsonException ex)
             {
+                System.Diagnostics.Debug.WriteLine($"[PersistenceService] JSON parse error: {ex.Message}");
+                return new List<Transaction>();
+            }
+            catch (IOException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[PersistenceService] File read error: {ex.Message}");
                 return new List<Transaction>();
             }
         }
