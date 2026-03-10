@@ -32,13 +32,13 @@ namespace wealth_tracker.Services
         public string JsonPath => _jsonPath;
         public string XmlPath => _xmlPath;
 
-        public List<Transaction> Load()
+        public async Task<List<Transaction>> LoadAsync()
         {
             if (!File.Exists(_jsonPath))
                 return new List<Transaction>();
             try
             {
-                var json = File.ReadAllText(_jsonPath);
+                var json = await File.ReadAllTextAsync(_jsonPath);
                 return JsonSerializer.Deserialize<List<Transaction>>(json, _jsonOptions) ?? new List<Transaction>();
             }
             catch (JsonException ex)
@@ -53,13 +53,13 @@ namespace wealth_tracker.Services
             }
         }
 
-        public void SaveJson(IEnumerable<Transaction> transactions)
+        public async Task SaveJsonAsync(IEnumerable<Transaction> transactions)
         {
             var json = JsonSerializer.Serialize(transactions, _jsonOptions);
-            File.WriteAllText(_jsonPath, json);
+            await File.WriteAllTextAsync(_jsonPath, json);
         }
 
-        public void SaveXml(IEnumerable<Transaction> transactions)
+        public async Task SaveXmlAsync(IEnumerable<Transaction> transactions)
         {
             var dt = new DataTable("Transactions");
             dt.Columns.Add("Id", typeof(string));
@@ -80,7 +80,7 @@ namespace wealth_tracker.Services
                 );
             }
 
-            dt.WriteXml(_xmlPath, XmlWriteMode.WriteSchema);
+            await Task.Run(() => dt.WriteXml(_xmlPath, XmlWriteMode.WriteSchema));
         }
     }
 }

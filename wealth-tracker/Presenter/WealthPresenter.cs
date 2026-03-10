@@ -33,7 +33,7 @@ namespace wealth_tracker.Presenter
             foreach (var t in saved)
                 _service.Add(t);
 
-            LoadSampleDataIfEmpty();
+            await LoadSampleDataIfEmptyAsync();
             RefreshAll();
         }
 
@@ -116,7 +116,7 @@ namespace wealth_tracker.Presenter
             _view.ShowLineChart(_service.GetBalanceTimeline());
         }
 
-        private void LoadSampleDataIfEmpty()
+        private async Task LoadSampleDataIfEmptyAsync()
         {
             if (_service.GetSummary().TransactionCount > 0) 
                 return;
@@ -178,7 +178,7 @@ namespace wealth_tracker.Presenter
                 Type = TransactionType.Expense 
             });
 
-            _persistence.SaveJsonAsync(_service.AllTransactions);
+            await _persistence.SaveJsonAsync(_service.AllTransactions);
         }
     }
 }
