@@ -63,10 +63,14 @@ namespace wealth_tracker.Services
             decimal running = 0;
             var result = new List<(DateTime, decimal)>();
 
-            foreach (var t in _transactions.OrderBy(c => c.Date))
+            var grouped = _transactions.OrderBy(c => c.Date).GroupBy(c => c.Date.Date);
+
+            foreach (var group in grouped)
             {
-                running += t.Type == TransactionType.Income ? t.Amount : -t.Amount;
-                result.Add((t.Date.Date, running));   
+                foreach (var t in group)
+                    running += t.Type == TransactionType.Income ? t.Amount : -t.Amount;
+
+                result.Add((group.Key, running));
             }
             return result;
         }
