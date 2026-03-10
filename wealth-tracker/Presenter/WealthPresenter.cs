@@ -74,7 +74,7 @@ namespace wealth_tracker.Presenter
             _view.ShowTransactions(_service.GetFiltered(_currentFilter));
         }
 
-        private void OnExport(object? sender, EventArgs e)
+        private async void OnExport(object? sender, EventArgs e)
         {
             var path = _view.AskSaveFilePath(
                 "CSV файл (*.csv)|*.csv",
@@ -84,7 +84,7 @@ namespace wealth_tracker.Presenter
                 return;
             try
             {
-                _export.ExportCsv(_service.GetFiltered(_currentFilter), path);
+                await _export.ExportCsvAsync(_service.GetFiltered(_currentFilter), path);
                 _view.ShowSuccess("Дані експортовано у CSV!");
             }
             catch (Exception ex)

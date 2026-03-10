@@ -10,7 +10,7 @@ namespace wealth_tracker.Services
 {
     public class ExportService
     {
-        public void ExportCsv(IEnumerable<Transaction> transactions, string filePath)
+        public async Task ExportCsvAsync(IEnumerable<Transaction> transactions, string filePath)
         {
             var csv = new StringBuilder();
             csv.AppendLine("Дата;Категорія;Сума;Тип");
@@ -18,7 +18,7 @@ namespace wealth_tracker.Services
             foreach (var t in transactions)
                 csv.AppendLine($"{t.Date:dd.MM.yyyy};{t.Category};{t.Amount:N2};{t.TypeDisplay}");
 
-            File.WriteAllText(filePath, csv.ToString(), Encoding.UTF8);
+            await File.WriteAllTextAsync(filePath, csv.ToString(), Encoding.UTF8);
         }
     }
 }
