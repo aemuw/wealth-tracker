@@ -33,11 +33,11 @@ following the MVP (Model-View-Presenter) architectural pattern.
 - .NET 9 SDK
 
 ### Installation
-\`\`\`bash
+```bash
 git clone https://github.com/aemuw/wealth-tracker.git
 cd wealth-tracker
-\`\`\`
-Then open \`wealth-tracker.sln\` in Visual Studio and press **F5** to run.
+```
+Then open `wealth-tracker.sln` in Visual Studio and press **F5** to run.
 
 ## Roadmap
 - [ ] Replace sync file I/O with async/await
