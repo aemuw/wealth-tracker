@@ -27,9 +27,9 @@ namespace wealth_tracker.Presenter
             _view.SaveXmlRequested += OnSaveXml;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            var saved = _persistence.Load();
+            var saved = await _persistence.LoadAsync();
             foreach (var t in saved)
                 _service.Add(t);
 
@@ -38,12 +38,12 @@ namespace wealth_tracker.Presenter
         }
 
 
-        private void OnTransactionAdd(object? sender, Transaction transaction)
+        private async void OnTransactionAdd(object? sender, Transaction transaction)
         {
             try
             {
                 _service.Add(transaction);
-                _persistence.SaveJson(_service.AllTransactions);
+                await _persistence.SaveJsonAsync(_service.AllTransactions);
                 _view.ClearAddForm();
                 _view.ShowSuccess("Транзакцію додано успішно!");
                 RefreshAll();
@@ -54,11 +54,11 @@ namespace wealth_tracker.Presenter
             }
         }
 
-        private void OnTransactionDelete(object? sender, Guid id)
+        private async void OnTransactionDelete(object? sender, Guid id)
         {
             if (_service.Remove(id))
             {
-                _persistence.SaveJson(_service.AllTransactions); 
+                await _persistence.SaveJsonAsync(_service.AllTransactions); 
                 _view.ShowSuccess("Транзакцію видалено!");
                 RefreshAll();
             }
@@ -84,7 +84,7 @@ namespace wealth_tracker.Presenter
                 return;
             try
             {
-                _export.ExportCsv(_service.GetFiltered(_currentFilter), dialog.FileName);
+                _export.ExportCsv(_service.GetFiltered(_currentFilter), path);
                 _view.ShowSuccess("Дані експортовано у CSV!");
             }
             catch (Exception ex)
@@ -93,11 +93,11 @@ namespace wealth_tracker.Presenter
             }
         }
 
-        private void OnSaveXml(object? sender, EventArgs e)
+        private async void OnSaveXml(object? sender, EventArgs e)
         {
             try
             {
-                _persistence.SaveXml(_service.AllTransactions);
+                await _persistence.SaveXmlAsync(_service.AllTransactions);
                 _view.ShowSuccess($"Збережено у XML:\n{_persistence.XmlPath}");
             }
             catch (Exception ex)
@@ -178,7 +178,7 @@ namespace wealth_tracker.Presenter
                 Type = TransactionType.Expense 
             });
 
-            _persistence.SaveJson(_service.AllTransactions);
+            _persistence.SaveJsonAsync(_service.AllTransactions);
         }
     }
 }
