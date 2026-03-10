@@ -20,7 +20,7 @@ namespace wealth_tracker.Models
         private decimal _amount;
         private TransactionType _type;
 
-        public Guid Id { get; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
         
         public DateTime Date
         {
