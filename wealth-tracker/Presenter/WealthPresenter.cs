@@ -76,23 +76,20 @@ namespace wealth_tracker.Presenter
 
         private void OnExport(object? sender, EventArgs e)
         {
-            using (var dialog = new SaveFileDialog())
-            {
-                dialog.Filter = "CSV файл (*.csv)|*.csv";
-                dialog.FileName = $"Транзакції_{DateTime.Now:yyyy-MM-dd}.csv";
+            var path = _view.AskSaveFilePath(
+                "CSV файл (*.csv)|*.csv",
+                $"Транзакції_{DateTime.Now:yyyy-MM-dd}.csv");
 
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        _export.ExportCsv(_service.GetFiltered(_currentFilter), dialog.FileName);
-                        _view.ShowSuccess("Дані експортовано у CSV!");
-                    }
-                    catch (Exception ex)
-                    {
-                        _view.ShowError($"Помилка експорту: {ex.Message}");
-                    }
-                }
+            if (path == null)
+                return;
+            try
+            {
+                _export.ExportCsv(_service.GetFiltered(_currentFilter), dialog.FileName);
+                _view.ShowSuccess("Дані експортовано у CSV!");
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка експорту: {ex.Message}");
             }
         }
 

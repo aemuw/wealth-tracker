@@ -122,6 +122,14 @@ namespace wealth_tracker
 
         public void ShowSuccess(string message) => MessageBox.Show(message, "Успіх", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+        public string? AskSaveFilePath(string filter, string defaultFileName)
+        {
+            using var dialog = new SaveFileDialog();
+            dialog.Filter = filter;
+            dialog.FileName = defaultFileName;
+            return dialog.ShowDialog() == DialogResult.OK ? dialog.FileName : null;
+        }
+
         public void ClearAddForm()
         {
             comboBoxCategory.SelectedIndex = -1;
