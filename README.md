@@ -30,7 +30,7 @@ following the MVP (Model-View-Presenter) architectural pattern.
 ### Prerequisites
 - Windows OS
 - Visual Studio 2022 or later
-- .NET 9 SDK
+- .NET 8 SDK
 
 ### Installation
 ```bash
