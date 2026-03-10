@@ -20,13 +20,13 @@ namespace wealth_tracker
         public event EventHandler ExportRequested = delegate { };
         public event EventHandler SaveXmlRequested = delegate { };
 
-        private readonly string[] _expenseCategories =
+        private static readonly string[] _expenseCategories =
         {
             "Їжа", "Транспорт", "Комунальні", "Розваги", "Одяг",
             "Здоров'я", "Освіта", "Спорт", "Подарунки", "Інше"
         };
 
-        private readonly string[] _incomeCategories =
+        private static readonly string[] _incomeCategories =
         {
             "Зарплата", "Фріланс", "Бізнес", "Інвестиції",
             "Подарунок", "Продаж", "Бонус", "Інше"
