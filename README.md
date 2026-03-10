@@ -18,7 +18,7 @@ following the MVP (Model-View-Presenter) architectural pattern.
 - Visual wallet status indicator based on balance
 
 ## Tech Stack
-- **Language:** C# (.NET 9)
+- **Language:** C# (.NET 8)
 - **UI:** Windows Forms
 - **Charts:** Microsoft Chart Controls (MSChart)
 - **Serialization:** System.Text.Json
