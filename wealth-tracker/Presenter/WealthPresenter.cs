@@ -9,12 +9,12 @@ namespace wealth_tracker.Presenter
     {
         private readonly IWealthView _view;
         private readonly TransactionService _service;
-        private readonly PersistenceService _persistence;
+        private readonly EfPersistenceService _persistence;
         private readonly ExportService _export = new ExportService();
 
         private TransactionFilter _currentFilter = new TransactionFilter();
 
-        public WealthPresenter(IWealthView view, TransactionService service, PersistenceService persistence)
+        public WealthPresenter(IWealthView view, TransactionService service, EfPersistenceService persistence)
         {
             _view = view;
             _service = service;
@@ -43,7 +43,7 @@ namespace wealth_tracker.Presenter
             try
             {
                 _service.Add(transaction);
-                await _persistence.SaveJsonAsync(_service.AllTransactions);
+                await _persistence.SaveAsync(transaction);
                 _view.ClearAddForm();
                 _view.ShowSuccess("Транзакцію додано успішно!");
                 RefreshAll();
@@ -58,7 +58,7 @@ namespace wealth_tracker.Presenter
         {
             if (_service.Remove(id))
             {
-                await _persistence.SaveJsonAsync(_service.AllTransactions); 
+                await _persistence.DeleteAsync(id); 
                 _view.ShowSuccess("Транзакцію видалено!");
                 RefreshAll();
             }
@@ -97,8 +97,8 @@ namespace wealth_tracker.Presenter
         {
             try
             {
-                await _persistence.SaveXmlAsync(_service.AllTransactions);
-                _view.ShowSuccess($"Збережено у XML:\n{_persistence.XmlPath}");
+                await _persistence.SaveAllAsync(_service.AllTransactions);
+                _view.ShowSuccess($"Збережено у БД:\n{_persistence.DbPath}");
             }
             catch (Exception ex)
             {
@@ -178,7 +178,7 @@ namespace wealth_tracker.Presenter
                 Type = TransactionType.Expense 
             });
 
-            await _persistence.SaveJsonAsync(_service.AllTransactions);
+            await _persistence.SaveAllAsync(_service.AllTransactions);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace wealth_tracker
             ApplicationConfiguration.Initialize();
 
             var service = new TransactionService();
-            var persistence = new PersistenceService("default");
+            var persistence = new EfPersistenceService();
             var form = new WealthTracker();
             var presenter = new WealthPresenter(form, service, persistence);
             form.SetPresenter(presenter);

@@ -14,14 +14,14 @@ namespace wealth_tracker.Tests
     {
         private Mock<IWealthView> _mockView;
         private TransactionService _service;
-        private PersistenceService _persistence;
+        private EfPersistenceService _persistence;
         private WealthPresenter _presenter;
 
         public WealthPresenterTests()
         {
             _mockView = new Mock<IWealthView>();
             _service = new TransactionService();
-            _persistence = new PersistenceService("test_user");
+            _persistence = new EfPersistenceService();
             _presenter = new WealthPresenter(_mockView.Object, _service, _persistence);
         }
 
