@@ -1,0 +1,6 @@
+@wealth_tracker.Api_HostAddress = http://localhost:5064
+
+GET {{wealth_tracker.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
