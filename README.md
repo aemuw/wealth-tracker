@@ -42,8 +42,8 @@ Then open `wealth-tracker.sln` in Visual Studio and press **F5** to run.
 ## Roadmap
 - [x] Replace sync file I/O with async/await
 - [x] Move SaveFileDialog out of Presenter (clean MVP)
+- [x] Add unit tests with xUnit and Moq
 - [ ] Migrate from JSON to SQLite via Entity Framework Core
-- [ ] Add unit tests with xUnit and Moq
 - [ ] Add Undo/Redo via Command pattern
 - [ ] ASP.NET Core Web API version
 
