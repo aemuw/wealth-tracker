@@ -20,6 +20,8 @@ namespace wealth_tracker.Api.Controllers
         [HttpPost("login")]
         public ActionResult<string> Login([FromBody] LoginRequest request)
         {
+            // TODO: перевірка через БД з хешованим паролем
+            // BCrypt
             if (request.Username != "admin" || request.Password != "admin123")
                 return Unauthorized("Невірний логін або пароль");
 
