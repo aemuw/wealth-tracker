@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations;
 
 namespace wealth_tracker.Models
 {
@@ -21,7 +22,8 @@ namespace wealth_tracker.Models
         private TransactionType _type;
 
         public Guid Id { get; init; } = Guid.NewGuid();
-        
+
+        [Required]
         public DateTime Date
         {
             get => _date;
@@ -31,6 +33,9 @@ namespace wealth_tracker.Models
                 OnPropertyChanged(); 
             }
         }
+
+        [Required]
+        [StringLength(100, MinimumLength = 1)]
         public string Category
         {
             get => _category;
@@ -40,6 +45,8 @@ namespace wealth_tracker.Models
             }
         }
 
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Сума має бути більше 0")]
         public decimal Amount
         {
             get => _amount;
@@ -52,6 +59,7 @@ namespace wealth_tracker.Models
             }
         }
 
+        [Required]
         public TransactionType Type
         {
             get => _type;
