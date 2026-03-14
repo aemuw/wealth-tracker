@@ -10,10 +10,17 @@ namespace wealth_tracker.Data
 {
     public class AppDbContext : DbContext
     {
+        public AppDbContext() { }
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
         public DbSet<Transaction> Transactions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite("Data Source=wealth-tracker.db");
+        {
+            if (!options.IsConfigured)
+                options.UseSqlite("Data Source=wealth-tracker.db");
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
