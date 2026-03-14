@@ -13,7 +13,7 @@ namespace wealth_tracker.Api
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite("Data Source=../wealth-tracker/wealth-tracker.db"));
+                options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
             
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
@@ -71,6 +71,16 @@ namespace wealth_tracker.Api
 
             builder.Services.AddAuthorization();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
+
             var app = builder.Build();
 
             app.UseExceptionHandler(errorApp =>
@@ -106,6 +116,8 @@ namespace wealth_tracker.Api
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAll");
 
             app.UseAuthentication();
             app.UseAuthorization();
