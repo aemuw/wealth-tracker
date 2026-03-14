@@ -44,8 +44,8 @@ Then open `wealth-tracker.sln` in Visual Studio and press **F5** to run.
 - [x] Move SaveFileDialog out of Presenter (clean MVP)
 - [x] Add unit tests with xUnit and Moq
 - [x] Migrate from JSON to SQLite via Entity Framework Core
+- [x] ASP.NET Core Web API version
 - [ ] Add Undo/Redo via Command pattern
-- [ ] ASP.NET Core Web API version
 
 ## What I Learned
 - Implementing MVP pattern in a Windows Forms application
