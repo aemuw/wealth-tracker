@@ -16,8 +16,10 @@ The goal of this project is to explore how a desktop client and backend API can 
 
 # Screenshot
 
-![WealthTracker Screenshot](screenshot.png)
-
+![WealthTracker_Main-Page](screenshots/main-page-ui.png)
+![WealthTracker_Transactions-Page](screenshots/transactions-page-ui.png)
+![WealthTracker_Analytics-Page](screenshots/analytics-page-ui.png)
+![WealthTracker_Swagger](screenshots/swagger.png)
 ---
 
 # Features
