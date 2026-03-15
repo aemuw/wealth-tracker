@@ -9,12 +9,12 @@ namespace wealth_tracker.Presenter
     {
         private readonly IWealthView _view;
         private readonly TransactionService _service;
-        private readonly EfPersistenceService _persistence;
+        private readonly IPersistenceService _persistence;
         private readonly ExportService _export = new ExportService();
 
         private TransactionFilter _currentFilter = new TransactionFilter();
 
-        public WealthPresenter(IWealthView view, TransactionService service, EfPersistenceService persistence)
+        public WealthPresenter(IWealthView view, TransactionService service, IPersistenceService persistence)
         {
             _view = view;
             _service = service;

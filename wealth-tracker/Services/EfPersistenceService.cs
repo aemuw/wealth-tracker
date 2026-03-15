@@ -9,7 +9,7 @@ using wealth_tracker.Models;
 
 namespace wealth_tracker.Services
 {
-    public class EfPersistenceService
+    public class EfPersistenceService : IPersistenceService
     {
         private readonly AppDbContext _context;
 
