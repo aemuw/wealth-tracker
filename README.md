@@ -66,11 +66,12 @@ The goal of this project is to explore how a desktop client and backend API can 
 ## Testing
 - xUnit
 - Moq
+- EF Core InMemory (for tests)
 
 ## Serialization / Export
 - System.Text.Json
+- CsvHelper
 - XML
-- CSV
 
 ---
 
@@ -123,10 +124,13 @@ Run with **F5**.
 Example endpoints:
 
 ```
-POST /auth/login
-GET /transactions
-POST /transactions
-DELETE /transactions/{id}
+POST   /api/auth/login
+GET    /api/transactions
+POST   /api/transactions
+GET    /api/transactions/{id}
+PUT    /api/transactions/{id}
+DELETE /api/transactions/{id}
+GET    /api/transactions/summary
 ```
 
 The API uses **JWT authentication** and **Entity Framework Core**.
@@ -167,11 +171,11 @@ This structure keeps UI, business logic, and persistence separated.
 
 Planned improvements:
 
-- [ ] Introduce DTOs for API models
-- [ ] Improve dependency injection usage
+- [x] Introduce DTOs for API models
+- [x] Improve dependency injection usage
+- [x] Improve async EF Core usage
 - [ ] Add repository pattern
 - [ ] Add FluentValidation
-- [ ] Improve async EF Core usage
 - [ ] Implement Undo/Redo via Command pattern
 - [ ] Improve API integration tests
 - [ ] Improve documentation
