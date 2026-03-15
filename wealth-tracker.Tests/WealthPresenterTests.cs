@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using wealth_tracker.Models;
 using wealth_tracker.Presenter;
 using wealth_tracker.Services;
+using wealth_tracker.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace wealth_tracker.Tests
 {
@@ -21,7 +18,14 @@ namespace wealth_tracker.Tests
         {
             _mockView = new Mock<IWealthView>();
             _service = new TransactionService();
-            _persistence = new EfPersistenceService();
+
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            var context = new AppDbContext(options);       
+            _persistence = new EfPersistenceService(context);
+            
             _presenter = new WealthPresenter(_mockView.Object, _service, _persistence);
         }
 

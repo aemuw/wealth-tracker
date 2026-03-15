@@ -13,9 +13,9 @@ namespace wealth_tracker.Services
     {
         private readonly AppDbContext _context;
 
-        public EfPersistenceService()
+        public EfPersistenceService(AppDbContext context)
         {
-            _context = new AppDbContext();
+            _context = context;
             _context.Database.EnsureCreated();
         }
 

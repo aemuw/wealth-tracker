@@ -2,6 +2,8 @@ using wealth_tracker;
 using Microsoft.Extensions.DependencyInjection;
 using wealth_tracker.Presenter;
 using wealth_tracker.Services;
+using wealth_tracker.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace wealth_tracker
 {
@@ -14,6 +16,7 @@ namespace wealth_tracker
 
             var services = new ServiceCollection();
 
+            services.AddDbContext<AppDbContext>();
             services.AddSingleton<TransactionService>();
             services.AddSingleton<IPersistenceService, EfPersistenceService>();
             services.AddSingleton<WealthTracker>();
