@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using System.Globalization;
 using wealth_tracker.Models;
 
 namespace wealth_tracker.Services
@@ -12,13 +9,28 @@ namespace wealth_tracker.Services
     {
         public async Task ExportCsvAsync(IEnumerable<Transaction> transactions, string filePath)
         {
-            var csv = new StringBuilder();
-            csv.AppendLine("Дата;Категорія;Сума;Тип");
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = ";"
+            };
+
+            await using var writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);
+            await using var csv = new CsvWriter(writer, config);
+
+            csv.WriteField("Дата");
+            csv.WriteField("Категорія");
+            csv.WriteField("Сума");
+            csv.WriteField("Тип");
+            await csv.NextRecordAsync();
 
             foreach (var t in transactions)
-                csv.AppendLine($"{t.Date:dd.MM.yyyy};{t.Category};{t.Amount:N2};{t.TypeDisplay}");
-
-            await File.WriteAllTextAsync(filePath, csv.ToString(), Encoding.UTF8);
+            {
+                csv.WriteField(t.Date.ToString("dd.MM.yyyy"));
+                csv.WriteField(t.Category);
+                csv.WriteField(t.Amount.ToString("N2"));
+                csv.WriteField(t.TypeDisplay);
+                await csv.NextRecordAsync();
+            }
         }
     }
 }
