@@ -3,6 +3,7 @@ using wealth_tracker.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using wealth_tracker.Api.Services;
 
 namespace wealth_tracker.Api
 {
@@ -14,7 +15,9 @@ namespace wealth_tracker.Api
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
-            
+
+            builder.Services.AddScoped<ITransactionService, TransactionsService>();
+
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
