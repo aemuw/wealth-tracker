@@ -5,5 +5,8 @@ obj/
 *.suo
 *.rsuser
 *.cache
+*.db
+*.db-shm
+*.db-wal
 transactions_*.json
 transactions_*.xml
