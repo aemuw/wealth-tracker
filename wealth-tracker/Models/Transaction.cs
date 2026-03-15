@@ -14,6 +14,11 @@ namespace wealth_tracker.Models
         Income, 
         Expense
     }
+
+    // Note: INotifyPropertyChanged is a UI concern and ideally should not be
+    // in a domain model. It is kept here for simplicity of WinForms data binding.
+    // In a clean architecture, a separate ObservableTransaction class
+    // would wrap the domain model for UI purposes.
     public class Transaction : INotifyPropertyChanged
     {
         private DateTime _date;
