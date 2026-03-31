@@ -132,6 +132,7 @@ namespace wealth_tracker
 
         public void ClearAddForm()
         {
+            textBoxNote.Clear();
             comboBoxCategory.SelectedIndex = -1;
             textBoxAmount.Clear();
             radioButtonExpense.Checked = true;
@@ -158,7 +159,8 @@ namespace wealth_tracker
                 Date = dateTimePickerTransaction.Value,
                 Category = comboBoxCategory.SelectedItem?.ToString() ?? string.Empty,
                 Amount = amount,
-                Type = radioButtonIncome.Checked ? TransactionType.Income : TransactionType.Expense
+                Type = radioButtonIncome.Checked ? TransactionType.Income : TransactionType.Expense,
+                Note = string.IsNullOrWhiteSpace(textBoxNote.Text) ? null : textBoxNote.Text.Trim() // ← ДОДАЙ
             });
         }
 
@@ -269,6 +271,12 @@ namespace wealth_tracker
                 HeaderText = "Тип",     
                 DataPropertyName = "TypeDisplay",
                 Width = 100
+            });
+            dataGridViewTransactions.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Нотатка",
+                DataPropertyName = "Note",
+                Width = 200
             });
         }
 

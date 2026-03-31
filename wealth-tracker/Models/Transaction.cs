@@ -25,6 +25,7 @@ namespace wealth_tracker.Models
         private string _category = string.Empty;
         private decimal _amount;
         private TransactionType _type;
+        
 
         public Guid Id { get; init; } = Guid.NewGuid();
 
@@ -77,6 +78,8 @@ namespace wealth_tracker.Models
         }
 
         public string TypeDisplay => Type == TransactionType.Income ? "Дохід" : "Витрата";
+
+        public string? Note { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
