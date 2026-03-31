@@ -134,5 +134,17 @@ namespace wealth_tracker.Services
             var label = new DateTime(now.Year, now.Month, daysInMonth).ToString("MMM yyyy") + "*";  
             return (label, forecast);
         }
-    }
+
+        public IEnumerable<Transaction> GetRecurring()
+            => _transactions.Where(t => t.IsRecurring);
+
+        public bool HasRecurringThisMonth(Transaction template)
+            => _transactions.Any(t =>
+            t.Category == template.Category &&
+            t.Amount == template.Amount &&
+            t.Type == template.Type &&
+            t.Date.Month == DateTime.Now.Month &&
+            t.Date.Year == DateTime.Now.Year &&
+            !t.IsRecurring);
+    }   
 }

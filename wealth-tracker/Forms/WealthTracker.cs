@@ -137,21 +137,29 @@ namespace wealth_tracker
             textBoxAmount.Clear();
             radioButtonExpense.Checked = true;
             dateTimePickerTransaction.Value = DateTime.Now;
+            checkBoxRecurring.Checked = false;
+            numericRecurringDay.Value = 1;
+        }
+
+        private void checkBoxRecurring_CheckedChanged(object sender, EventArgs e)
+        {
+            labelRecurringDay.Visible = checkBoxRecurring.Checked;
+            numericRecurringDay.Visible = checkBoxRecurring.Checked;
         }
 
         private void btnAddTransaction_Click(object sender, EventArgs e)
         {
             if (comboBoxCategory.SelectedIndex == -1)
-            { 
-                ShowError("Виберіть категорію"); 
-                return; 
+            {
+                ShowError("Виберіть категорію");
+                return;
             }
 
-            if (!decimal.TryParse(textBoxAmount.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, 
+            if (!decimal.TryParse(textBoxAmount.Text.Replace(",", "."), System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out decimal amount) || amount <= 0)
-            { 
-                ShowError("Введіть коректну суму (більше 0)"); 
-                return; 
+            {
+                ShowError("Введіть коректну суму (більше 0)");
+                return;
             }
 
             TransactionAddRequested.Invoke(this, new Transaction
@@ -160,7 +168,9 @@ namespace wealth_tracker
                 Category = comboBoxCategory.SelectedItem?.ToString() ?? string.Empty,
                 Amount = amount,
                 Type = radioButtonIncome.Checked ? TransactionType.Income : TransactionType.Expense,
-                Note = string.IsNullOrWhiteSpace(textBoxNote.Text) ? null : textBoxNote.Text.Trim() // ← ДОДАЙ
+                Note = string.IsNullOrWhiteSpace(textBoxNote.Text) ? null : textBoxNote.Text.Trim(),
+                IsRecurring = checkBoxRecurring.Checked,
+                RecurringDay = checkBoxRecurring.Checked ? (int?)numericRecurringDay.Value : null
             });
         }
 
@@ -169,7 +179,7 @@ namespace wealth_tracker
             if (dataGridViewTransactions.SelectedRows.Count == 0)
             {
                 ShowError("Виберіть транзакцію для видалення");
-                return; 
+                return;
             }
 
             var result = MessageBox.Show("Видалити обрану транзакцію?", "Підтвердження", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -184,7 +194,7 @@ namespace wealth_tracker
         {
             textBoxSearch.Clear();
             dateTimePickerStart.Value = DateTime.Now.AddMonths(-1);
-            dateTimePickerEnd.Value   = DateTime.Now;
+            dateTimePickerEnd.Value = DateTime.Now;
             checkBoxFilterDate.Checked = false;
             FilterChanged.Invoke(this, new TransactionFilter());
         }
@@ -247,28 +257,28 @@ namespace wealth_tracker
             dataGridViewTransactions.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             dataGridViewTransactions.Columns.Add(new DataGridViewTextBoxColumn
-            { 
+            {
                 HeaderText = "Дата",
                 DataPropertyName = "Date",
-                DefaultCellStyle = { Format = "dd.MM.yyyy" }, 
-                Width = 110 
+                DefaultCellStyle = { Format = "dd.MM.yyyy" },
+                Width = 110
             });
             dataGridViewTransactions.Columns.Add(new DataGridViewTextBoxColumn
-                { 
+            {
                 HeaderText = "Категорія",
-                DataPropertyName = "Category",  
+                DataPropertyName = "Category",
                 Width = 160
             });
             dataGridViewTransactions.Columns.Add(new DataGridViewTextBoxColumn
             {
-                HeaderText = "Сума (₴)",  
+                HeaderText = "Сума (₴)",
                 DataPropertyName = "Amount",
-                DefaultCellStyle = { Format = "N2", Alignment = DataGridViewContentAlignment.MiddleRight }, 
-                Width = 120 
+                DefaultCellStyle = { Format = "N2", Alignment = DataGridViewContentAlignment.MiddleRight },
+                Width = 120
             });
             dataGridViewTransactions.Columns.Add(new DataGridViewTextBoxColumn
             {
-                HeaderText = "Тип",     
+                HeaderText = "Тип",
                 DataPropertyName = "TypeDisplay",
                 Width = 100
             });
@@ -277,6 +287,12 @@ namespace wealth_tracker
                 HeaderText = "Нотатка",
                 DataPropertyName = "Note",
                 Width = 200
+            });
+            dataGridViewTransactions.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Повторювана",
+                DataPropertyName = "IsRecurring",
+                Width = 100
             });
         }
 

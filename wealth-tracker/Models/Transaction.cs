@@ -80,6 +80,8 @@ namespace wealth_tracker.Models
         public string TypeDisplay => Type == TransactionType.Income ? "Дохід" : "Витрата";
 
         public string? Note { get; set; }
+        public bool IsRecurring { get; set; } = false;
+        public int? RecurringDay { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

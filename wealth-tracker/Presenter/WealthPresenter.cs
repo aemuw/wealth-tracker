@@ -47,10 +47,37 @@ namespace wealth_tracker.Presenter
             await _savingsService.LoadAsync();
             await _budgetService.LoadAsync();
 
+            await ProcessRecurringTransactionsAsync();
             await LoadSampleDataIfEmptyAsync();
             RefreshAll();
         }
 
+        private async Task ProcessRecurringTransactionsAsync()
+        {
+            var recurring = _service.GetRecurring().ToList();
+
+            foreach (var template in recurring)
+            {
+                if (_service.HasRecurringThisMonth(template))
+                    continue;
+
+                if (template.RecurringDay.HasValue && DateTime.Now.Day < template.RecurringDay.Value)
+                    continue;
+
+                var copy = new Transaction
+                {
+                    Date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, template.RecurringDay ?? DateTime.Now.Day),
+                    Category = template.Category,
+                    Amount = template.Amount,
+                    Type = template.Type,
+                    Note = $"Автоматично (повторювана)",
+                    IsRecurring = false
+                };
+
+                _service.Add(copy);
+                await _persistence.SaveAsync(copy);
+            }
+        }
 
         private async void OnTransactionAdd(object? sender, Transaction transaction)
         {

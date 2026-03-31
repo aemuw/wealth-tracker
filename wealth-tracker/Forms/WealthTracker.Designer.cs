@@ -37,6 +37,9 @@ namespace wealth_tracker
             dateTimePickerTransaction = new DateTimePicker();
             labelNote = new Label();
             textBoxNote = new TextBox();
+            checkBoxRecurring = new CheckBox();
+            labelRecurringDay = new Label();
+            numericRecurringDay = new NumericUpDown();
             btnAddTransaction = new Button();
             tabPageTransactions = new TabPage();
             panelFilter = new Panel();
@@ -84,6 +87,7 @@ namespace wealth_tracker
             panelStatistics.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxWallet).BeginInit();
             groupBoxAddTransaction.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericRecurringDay).BeginInit();
             tabPageTransactions.SuspendLayout();
             panelFilter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewTransactions).BeginInit();
@@ -208,7 +212,7 @@ namespace wealth_tracker
             pictureBoxWallet.Location = new Point(11, 209);
             pictureBoxWallet.Margin = new Padding(3, 4, 3, 4);
             pictureBoxWallet.Name = "pictureBoxWallet";
-            pictureBoxWallet.Size = new Size(280, 306);
+            pictureBoxWallet.Size = new Size(280, 347);
             pictureBoxWallet.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBoxWallet.TabIndex = 1;
             pictureBoxWallet.TabStop = false;
@@ -226,13 +230,16 @@ namespace wealth_tracker
             groupBoxAddTransaction.Controls.Add(dateTimePickerTransaction);
             groupBoxAddTransaction.Controls.Add(labelNote);
             groupBoxAddTransaction.Controls.Add(textBoxNote);
+            groupBoxAddTransaction.Controls.Add(checkBoxRecurring);
+            groupBoxAddTransaction.Controls.Add(labelRecurringDay);
+            groupBoxAddTransaction.Controls.Add(numericRecurringDay);
             groupBoxAddTransaction.Controls.Add(btnAddTransaction);
             groupBoxAddTransaction.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             groupBoxAddTransaction.Location = new Point(306, 209);
             groupBoxAddTransaction.Margin = new Padding(3, 4, 3, 4);
             groupBoxAddTransaction.Name = "groupBoxAddTransaction";
             groupBoxAddTransaction.Padding = new Padding(3, 4, 3, 4);
-            groupBoxAddTransaction.Size = new Size(914, 308);
+            groupBoxAddTransaction.Size = new Size(914, 347);
             groupBoxAddTransaction.TabIndex = 2;
             groupBoxAddTransaction.TabStop = false;
             groupBoxAddTransaction.Text = "Додати транзакцію";
@@ -277,7 +284,7 @@ namespace wealth_tracker
             // 
             labelCategory.AutoSize = true;
             labelCategory.Font = new Font("Segoe UI", 9F);
-            labelCategory.Location = new Point(17, 122);
+            labelCategory.Location = new Point(17, 119);
             labelCategory.Name = "labelCategory";
             labelCategory.Size = new Size(79, 20);
             labelCategory.TabIndex = 3;
@@ -287,7 +294,7 @@ namespace wealth_tracker
             // 
             comboBoxCategory.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxCategory.Font = new Font("Segoe UI", 10F);
-            comboBoxCategory.Location = new Point(17, 150);
+            comboBoxCategory.Location = new Point(15, 143);
             comboBoxCategory.Margin = new Padding(3, 4, 3, 4);
             comboBoxCategory.Name = "comboBoxCategory";
             comboBoxCategory.Size = new Size(252, 31);
@@ -297,7 +304,7 @@ namespace wealth_tracker
             // 
             labelAmount.AutoSize = true;
             labelAmount.Font = new Font("Segoe UI", 9F);
-            labelAmount.Location = new Point(303, 35);
+            labelAmount.Location = new Point(15, 193);
             labelAmount.Name = "labelAmount";
             labelAmount.Size = new Size(69, 20);
             labelAmount.TabIndex = 5;
@@ -306,17 +313,17 @@ namespace wealth_tracker
             // textBoxAmount
             // 
             textBoxAmount.Font = new Font("Segoe UI", 10F);
-            textBoxAmount.Location = new Point(303, 59);
+            textBoxAmount.Location = new Point(15, 218);
             textBoxAmount.Margin = new Padding(3, 4, 3, 4);
             textBoxAmount.Name = "textBoxAmount";
-            textBoxAmount.Size = new Size(186, 30);
+            textBoxAmount.Size = new Size(252, 30);
             textBoxAmount.TabIndex = 6;
             // 
             // labelDate
             // 
             labelDate.AutoSize = true;
             labelDate.Font = new Font("Segoe UI", 9F);
-            labelDate.Location = new Point(303, 127);
+            labelDate.Location = new Point(303, 39);
             labelDate.Name = "labelDate";
             labelDate.Size = new Size(44, 20);
             labelDate.TabIndex = 7;
@@ -326,7 +333,7 @@ namespace wealth_tracker
             // 
             dateTimePickerTransaction.Font = new Font("Segoe UI", 10F);
             dateTimePickerTransaction.Format = DateTimePickerFormat.Short;
-            dateTimePickerTransaction.Location = new Point(303, 151);
+            dateTimePickerTransaction.Location = new Point(303, 63);
             dateTimePickerTransaction.Margin = new Padding(3, 4, 3, 4);
             dateTimePickerTransaction.Name = "dateTimePickerTransaction";
             dateTimePickerTransaction.Size = new Size(186, 30);
@@ -336,7 +343,7 @@ namespace wealth_tracker
             // 
             labelNote.AutoSize = true;
             labelNote.Font = new Font("Segoe UI", 9F);
-            labelNote.Location = new Point(516, 35);
+            labelNote.Location = new Point(516, 27);
             labelNote.Name = "labelNote";
             labelNote.Size = new Size(67, 20);
             labelNote.TabIndex = 9;
@@ -345,11 +352,45 @@ namespace wealth_tracker
             // textBoxNote
             // 
             textBoxNote.Font = new Font("Segoe UI", 10F);
-            textBoxNote.Location = new Point(516, 59);
+            textBoxNote.Location = new Point(516, 52);
             textBoxNote.Multiline = true;
             textBoxNote.Name = "textBoxNote";
-            textBoxNote.Size = new Size(355, 122);
+            textBoxNote.Size = new Size(377, 188);
             textBoxNote.TabIndex = 10;
+            // 
+            // checkBoxRecurring
+            // 
+            checkBoxRecurring.AutoSize = true;
+            checkBoxRecurring.Font = new Font("Segoe UI", 9F);
+            checkBoxRecurring.Location = new Point(303, 218);
+            checkBoxRecurring.Name = "checkBoxRecurring";
+            checkBoxRecurring.Size = new Size(128, 24);
+            checkBoxRecurring.TabIndex = 11;
+            checkBoxRecurring.Text = "Повторювана";
+            checkBoxRecurring.CheckedChanged += checkBoxRecurring_CheckedChanged;
+            // 
+            // labelRecurringDay
+            // 
+            labelRecurringDay.AutoSize = true;
+            labelRecurringDay.Font = new Font("Segoe UI", 9F);
+            labelRecurringDay.Location = new Point(303, 119);
+            labelRecurringDay.Name = "labelRecurringDay";
+            labelRecurringDay.Size = new Size(98, 20);
+            labelRecurringDay.TabIndex = 12;
+            labelRecurringDay.Text = "День місяця:";
+            labelRecurringDay.Visible = false;
+            // 
+            // numericRecurringDay
+            // 
+            numericRecurringDay.Font = new Font("Segoe UI", 10F);
+            numericRecurringDay.Location = new Point(303, 142);
+            numericRecurringDay.Maximum = new decimal(new int[] { 28, 0, 0, 0 });
+            numericRecurringDay.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericRecurringDay.Name = "numericRecurringDay";
+            numericRecurringDay.Size = new Size(98, 30);
+            numericRecurringDay.TabIndex = 13;
+            numericRecurringDay.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numericRecurringDay.Visible = false;
             // 
             // btnAddTransaction
             // 
@@ -359,7 +400,7 @@ namespace wealth_tracker
             btnAddTransaction.FlatStyle = FlatStyle.Flat;
             btnAddTransaction.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnAddTransaction.ForeColor = Color.White;
-            btnAddTransaction.Location = new Point(17, 218);
+            btnAddTransaction.Location = new Point(15, 266);
             btnAddTransaction.Margin = new Padding(3, 4, 3, 4);
             btnAddTransaction.Name = "btnAddTransaction";
             btnAddTransaction.Size = new Size(878, 64);
@@ -899,6 +940,7 @@ namespace wealth_tracker
             ((System.ComponentModel.ISupportInitialize)pictureBoxWallet).EndInit();
             groupBoxAddTransaction.ResumeLayout(false);
             groupBoxAddTransaction.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericRecurringDay).EndInit();
             tabPageTransactions.ResumeLayout(false);
             panelFilter.ResumeLayout(false);
             panelFilter.PerformLayout();
@@ -928,6 +970,9 @@ namespace wealth_tracker
         private Label labelForecast;
         private PictureBox pictureBoxWallet;
         private GroupBox groupBoxAddTransaction;
+        private CheckBox checkBoxRecurring;
+        private NumericUpDown numericRecurringDay;
+        private Label labelRecurringDay;
         private Label labelType;
         private RadioButton radioButtonExpense;
         private RadioButton radioButtonIncome;
