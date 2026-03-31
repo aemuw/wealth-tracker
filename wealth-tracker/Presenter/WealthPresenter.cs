@@ -1,5 +1,3 @@
-using System;
-using System.Windows.Forms;
 using wealth_tracker.Models;
 using wealth_tracker.Services;
 
@@ -10,21 +8,34 @@ namespace wealth_tracker.Presenter
         private readonly IWealthView _view;
         private readonly TransactionService _service;
         private readonly IPersistenceService _persistence;
+        private readonly SavingsGoalService _savingsService;
+        private readonly BudgetService _budgetService;
         private readonly ExportService _export = new ExportService();
 
         private TransactionFilter _currentFilter = new TransactionFilter();
 
-        public WealthPresenter(IWealthView view, TransactionService service, IPersistenceService persistence)
+        public WealthPresenter(IWealthView view, TransactionService service, IPersistenceService persistence, SavingsGoalService savingsService, BudgetService budgetService)
         {
             _view = view;
             _service = service;
             _persistence = persistence;
+            _savingsService = savingsService;
+            _budgetService = budgetService;
 
             _view.TransactionAddRequested += OnTransactionAdd;
             _view.TransactionDeleteRequested += OnTransactionDelete;
             _view.FilterChanged += OnFilterChanged;
             _view.ExportRequested += OnExport;
             _view.SaveXmlRequested += OnSaveXml;
+
+            _view.SavingsGoalAddRequested += OnSavingsGoalAdd;
+            _view.SavingsGoalDeleteRequested += OnSavingsGoalDelete;
+            _view.SavingsDepositRequested += OnSavingsDeposit;
+
+            _view.BudgetLimitAddRequested += OnBugetLimitAdd;
+            _view.BudgetLimitDeleteRequested += OnBudgetLimitDelete;
+
+            _view.ReportRequest += OnReportRequest;
         }
 
         public async Task InitializeAsync()
@@ -32,6 +43,9 @@ namespace wealth_tracker.Presenter
             var saved = await _persistence.LoadAsync();
             foreach (var t in saved)
                 _service.Add(t);
+
+            await _savingsService.LoadAsync();
+            await _budgetService.LoadAsync();
 
             await LoadSampleDataIfEmptyAsync();
             RefreshAll();
@@ -58,7 +72,7 @@ namespace wealth_tracker.Presenter
         {
             if (_service.Remove(id))
             {
-                await _persistence.DeleteAsync(id); 
+                await _persistence.DeleteAsync(id);
                 _view.ShowSuccess("Транзакцію видалено!");
                 RefreshAll();
             }
@@ -109,76 +123,187 @@ namespace wealth_tracker.Presenter
         private void RefreshAll()
         {
             var summary = _service.GetSummary();
+            _budgetService.RecalculateSpent(_service.AllTransactions);
+
             _view.ShowSummary(summary);
             _view.ShowWalletStatus(summary.Balance);
             _view.ShowTransactions(_service.GetFiltered(_currentFilter));
             _view.ShowPieChart(_service.GetExpensesByCategory());
             _view.ShowLineChart(_service.GetBalanceTimeline());
+            _view.ShowForecast(_service.GetMonthlyForecast());
+            _view.ShowSavingsGoals(_savingsService.AllGoals);
+            _view.ShowBudgetLimits(_budgetService.GetCurrentMonth());
         }
 
         private async Task LoadSampleDataIfEmptyAsync()
         {
-            if (_service.GetSummary().TransactionCount > 0) 
+            if (_service.GetSummary().TransactionCount > 0)
                 return;
 
-            _service.Add(new Transaction 
-            { 
-                Date = DateTime.Now.AddDays(-10), 
-                Category = "Зарплата", 
-                Amount = 15000, 
-                Type = TransactionType.Income 
-            });
-            _service.Add(new Transaction 
+            _service.Add(new Transaction
             {
-                Date = DateTime.Now.AddDays(-9), 
-                Category = "Їжа", 
-                Amount = 450, 
-                Type = TransactionType.Expense 
+                Date = DateTime.Now.AddDays(-10),
+                Category = "Зарплата",
+                Amount = 15000,
+                Type = TransactionType.Income
             });
-            _service.Add(new Transaction 
+            _service.Add(new Transaction
             {
-                Date = DateTime.Now.AddDays(-7), 
-                Category = "Транспорт", 
-                Amount = 200, 
-                Type = TransactionType.Expense 
-            });
-            _service.Add(new Transaction 
-            {
-                Date = DateTime.Now.AddDays(-5), 
-                Category = "Комунальні", 
-                Amount = 800, 
-                Type = TransactionType.Expense 
-            });
-            _service.Add(new Transaction 
-            {
-                Date = DateTime.Now.AddDays(-4), 
-                Category = "Розваги", 
-                Amount = 350, 
-                Type = TransactionType.Expense 
-            });
-            _service.Add(new Transaction 
-            {
-                Date = DateTime.Now.AddDays(-2), 
-                Category = "Фріланс", 
-                Amount = 3000, 
-                Type = TransactionType.Income 
-            });
-            _service.Add(new Transaction 
-            {
-                Date = DateTime.Now.AddDays(-1), 
-                Category = "Їжа", 
-                Amount = 280, 
+                Date = DateTime.Now.AddDays(-9),
+                Category = "Їжа",
+                Amount = 450,
                 Type = TransactionType.Expense
             });
-            _service.Add(new Transaction 
-            { 
+            _service.Add(new Transaction
+            {
+                Date = DateTime.Now.AddDays(-7),
+                Category = "Транспорт",
+                Amount = 200,
+                Type = TransactionType.Expense
+            });
+            _service.Add(new Transaction
+            {
+                Date = DateTime.Now.AddDays(-5),
+                Category = "Комунальні",
+                Amount = 800,
+                Type = TransactionType.Expense
+            });
+            _service.Add(new Transaction
+            {
+                Date = DateTime.Now.AddDays(-4),
+                Category = "Розваги",
+                Amount = 350,
+                Type = TransactionType.Expense
+            });
+            _service.Add(new Transaction
+            {
+                Date = DateTime.Now.AddDays(-2),
+                Category = "Фріланс",
+                Amount = 3000,
+                Type = TransactionType.Income
+            });
+            _service.Add(new Transaction
+            {
+                Date = DateTime.Now.AddDays(-1),
+                Category = "Їжа",
+                Amount = 280,
+                Type = TransactionType.Expense
+            });
+            _service.Add(new Transaction
+            {
                 Date = DateTime.Now,
-                Category = "Здоров'я", 
-                Amount = 500, 
-                Type = TransactionType.Expense 
+                Category = "Здоров'я",
+                Amount = 500,
+                Type = TransactionType.Expense
             });
 
             await _persistence.SaveAllAsync(_service.AllTransactions);
         }
+
+        private async void OnSavingsGoalAdd(object? sender, SavingsGoal goal)
+        {
+            try
+            {
+                await _savingsService.AddAsync(goal);
+                _view.ShowSuccess($"Ціль \"{goal.Name}\" додано!");
+                RefreshAll();
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка: {ex.Message}");
+            }
+        }
+
+        private async void OnSavingsGoalDelete(object? sender, Guid id)
+        {
+            try
+            {
+                await _savingsService.DeleteAsync(id);
+                _view.ShowSuccess("Ціль видалено!");
+                RefreshAll();
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка: {ex.Message}");
+            }
+        }
+
+        private async void OnSavingsDeposit(object? sender, (Guid GoalId, decimal Amount) args)
+        {
+            try
+            {
+                await _savingsService.DepositAsync(args.GoalId, args.Amount);
+                _view.ShowSuccess($"Поповнено на {args.Amount:N2} ₴!");
+                RefreshAll();
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка: {ex.Message}");
+            }
+        }
+
+        private async void OnBugetLimitAdd(object? sender, BudgetLimit limit)
+        {
+            try
+            {
+                await _budgetService.AddOrUpdateAsync(limit);
+                _view.ShowSuccess($"Ліміт для \"{limit.Category}\" встановлено!");
+                RefreshAll();
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка: {ex.Message}");
+            }
+        }
+
+        private async void OnBudgetLimitDelete(object? sender, Guid id)
+        {
+            try
+            {
+                await _budgetService.DeleteAsync(id);
+                _view.ShowSuccess("Ліміт видалено!");
+                RefreshAll();
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка: {ex.Message}");
+            }
+        }
+
+        private async void OnReportRequest(object? sender, string format)
+        {
+            var path = _view.AskSaveFilePath(
+                "PDF файл (*.pdf)|*.pdf",
+                $"Звіт_{DateTime.Now:yyyy-MM}.pdf");
+
+            if (path == null)
+                return;
+
+            try
+            {
+                var reportService = new ReportService();
+                reportService.GeneratePdfReport(
+                    _service.GetSummary(),
+                    _service.AllTransactions,
+                    _service.GetMonthlyForecast(),
+                    _savingsService.AllGoals,
+                    _budgetService.GetCurrentMonth(),
+                    path);
+
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = true
+                });
+
+                _view.ShowSuccess($"Звіт збережено:\n{path}");
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка звіту: {ex.Message}");
+            }
+        }
+
+
     }
 }

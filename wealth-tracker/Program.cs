@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using wealth_tracker.Presenter;
 using wealth_tracker.Services;
 using wealth_tracker.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace wealth_tracker
 {
@@ -22,6 +21,8 @@ namespace wealth_tracker
             services.AddSingleton<WealthTracker>();
             services.AddSingleton<IWealthView>(provider => provider.GetRequiredService<WealthTracker>());
             services.AddSingleton<WealthPresenter>();
+            services.AddSingleton<SavingsGoalService>();
+            services.AddSingleton<BudgetService>();
 
             var provider = services.BuildServiceProvider();
 

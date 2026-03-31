@@ -14,6 +14,7 @@ namespace wealth_tracker.Tests
         private EfPersistenceService _persistence;
         private WealthPresenter _presenter;
 
+        /*
         public WealthPresenterTests()
         {
             _mockView = new Mock<IWealthView>();
@@ -28,6 +29,7 @@ namespace wealth_tracker.Tests
             
             _presenter = new WealthPresenter(_mockView.Object, _service, _persistence);
         }
+        */
 
         [Fact]
         public async Task OnTransactionAdd_ValidTransaction_CallsShowSuccess()

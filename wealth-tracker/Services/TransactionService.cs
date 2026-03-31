@@ -74,5 +74,25 @@ namespace wealth_tracker.Services
             }
             return result;
         }
+        public decimal GetMonthlyForecast()
+        {
+            var now = DateTime.Now;
+            var currentBalance = GetSummary().Balance;
+
+            var monthlyExpenses = _transactions
+                .Where(t => t.Type == TransactionType.Expense
+                         && t.Date.Month == now.Month
+                         && t.Date.Year == now.Year)
+                .Sum(t => t.Amount);
+
+            var daysPassed = now.Day;
+            if (daysPassed == 0) return currentBalance;
+
+            var avgPerDay = monthlyExpenses / daysPassed;
+
+            var daysLeft = DateTime.DaysInMonth(now.Year, now.Month) - now.Day;
+
+            return currentBalance - avgPerDay * daysLeft;
+        }
     }
 }

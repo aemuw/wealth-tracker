@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using wealth_tracker.Models;
-using wealth_tracker.Services;
 using wealth_tracker.Presenter;
 
 namespace wealth_tracker
@@ -19,6 +13,12 @@ namespace wealth_tracker
         public event EventHandler<TransactionFilter> FilterChanged = delegate { };
         public event EventHandler ExportRequested = delegate { };
         public event EventHandler SaveXmlRequested = delegate { };
+        public event EventHandler<SavingsGoal> SavingsGoalAddRequested = delegate { };
+        public event EventHandler<Guid> SavingsGoalDeleteRequested = delegate { };
+        public event EventHandler<(Guid GoalId, decimal Amount)> SavingsDepositRequested = delegate { };
+        public event EventHandler<BudgetLimit> BudgetLimitAddRequested = delegate { };
+        public event EventHandler<Guid> BudgetLimitDeleteRequested = delegate { };
+        public event EventHandler<string> ReportRequest = delegate { };
 
         private static readonly string[] _expenseCategories =
         {
@@ -221,6 +221,8 @@ namespace wealth_tracker
         {
             comboBoxCategory.Items.Clear();
             comboBoxCategory.Items.AddRange(_expenseCategories);
+            comboBoxBudgetCategory.Items.Clear();
+            comboBoxBudgetCategory.Items.AddRange(_expenseCategories);
         }
 
         private void InitializeDataGrid()
@@ -366,5 +368,167 @@ namespace wealth_tracker
         {
             textBoxSearch.Focus();
         }
+
+        public void ShowForecast(decimal forecast)
+        {
+            labelForecast.Text = $"Прогноз на кінець місяця\n{forecast:N2} ₴";
+            labelForecast.ForeColor = forecast >= 0 ? Color.FromArgb(39, 174, 96) : Color.FromArgb(192, 57, 43);
+        }
+
+        public void ShowSavingsGoals(IReadOnlyList<SavingsGoal> goals)
+        {
+            if (dataGridViewSavings.Columns.Count == 0)
+                InitializeSavingsGrid();
+
+            dataGridViewSavings.DataSource = null;
+            dataGridViewSavings.DataSource = new System.ComponentModel.BindingList<SavingsGoal>(
+                new List<SavingsGoal>(goals));
+
+            foreach (DataGridViewRow row in dataGridViewSavings.Rows)
+                if (row.DataBoundItem is SavingsGoal g)
+                    row.DefaultCellStyle.BackColor = g.IsCompleted
+                        ? Color.FromArgb(212, 239, 223)
+                        : Color.White;
+        }
+
+        public void ShowBudgetLimits(IReadOnlyList<BudgetLimit> limits)
+        {
+            if (dataGridViewBudget.Columns.Count == 0)
+                InitializeBudgetGrid();
+
+            dataGridViewBudget.DataSource = null;
+            dataGridViewBudget.DataSource = new System.ComponentModel.BindingList<BudgetLimit>(
+                new List<BudgetLimit>(limits));
+
+            foreach (DataGridViewRow row in dataGridViewBudget.Rows)
+                if (row.DataBoundItem is BudgetLimit b)
+                    row.DefaultCellStyle.BackColor = b.IsExceeded
+                        ? Color.FromArgb(250, 219, 216)
+                        : Color.White;
+        }
+
+        private void InitializeSavingsGrid()
+        {
+            dataGridViewSavings.AutoGenerateColumns = false;
+            dataGridViewSavings.EnableHeadersVisualStyles = false;
+            dataGridViewSavings.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
+            dataGridViewSavings.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridViewSavings.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewSavings.ColumnHeadersHeight = 40;
+            dataGridViewSavings.RowTemplate.Height = 32;
+
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Назва", DataPropertyName = "Name" });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Ціль (₴)", DataPropertyName = "TargetAmount", DefaultCellStyle = { Format = "N2" } });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Накопичено (₴)", DataPropertyName = "SavedAmount", DefaultCellStyle = { Format = "N2" } });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Прогрес (%)", DataPropertyName = "Progress", DefaultCellStyle = { Format = "F1" } });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Внесок/міс (₴)", DataPropertyName = "MonthlyRequired", DefaultCellStyle = { Format = "N2" } });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Дедлайн", DataPropertyName = "Deadline", DefaultCellStyle = { Format = "dd.MM.yyyy" } });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Нотатка", DataPropertyName = "Note" });
+        }
+
+        private void InitializeBudgetGrid()
+        {
+            dataGridViewBudget.AutoGenerateColumns = false;
+            dataGridViewBudget.EnableHeadersVisualStyles = false;
+            dataGridViewBudget.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
+            dataGridViewBudget.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridViewBudget.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewBudget.ColumnHeadersHeight = 40;
+            dataGridViewBudget.RowTemplate.Height = 32;
+
+            dataGridViewBudget.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Категорія", DataPropertyName = "Category" });
+            dataGridViewBudget.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Ліміт (₴)", DataPropertyName = "LimitAmount", DefaultCellStyle = { Format = "N2" } });
+            dataGridViewBudget.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Витрачено (₴)", DataPropertyName = "SpentAmount", DefaultCellStyle = { Format = "N2" } });
+            dataGridViewBudget.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Залишок (₴)", DataPropertyName = "Remaining", DefaultCellStyle = { Format = "N2" } });
+            dataGridViewBudget.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Перевищено", DataPropertyName = "IsExceeded" });
+            dataGridViewBudget.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Можна/день (₴)", DataPropertyName = "DailyAllowance", DefaultCellStyle = { Format = "N2" } });
+        }
+
+        private void btnAddSavingsGoal_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(textBoxSavingsName.Text))
+            { ShowError("Введіть назву цілі"); return; }
+
+            if (!decimal.TryParse(textBoxSavingsTarget.Text.Replace(",", "."),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal target) || target <= 0)
+            { ShowError("Введіть коректну суму цілі"); return; }
+
+            SavingsGoalAddRequested.Invoke(this, new SavingsGoal
+            {
+                Name = textBoxSavingsName.Text.Trim(),
+                TargetAmount = target,
+                Deadline = dateTimePickerSavingsDeadline.Value,
+                Note = string.IsNullOrWhiteSpace(textBoxSavingsNote.Text) ? null : textBoxSavingsNote.Text.Trim()
+            });
+
+            textBoxSavingsName.Clear();
+            textBoxSavingsTarget.Clear();
+            textBoxSavingsNote.Clear();
+            dateTimePickerSavingsDeadline.Value = DateTime.Now.AddMonths(6);
+        }
+
+        private void btnDeposit_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewSavings.SelectedRows.Count == 0)
+            { ShowError("Виберіть ціль для поповнення"); return; }
+
+            if (!decimal.TryParse(textBoxDepositAmount.Text.Replace(",", "."),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal amount) || amount <= 0)
+            { ShowError("Введіть коректну суму"); return; }
+
+            if (dataGridViewSavings.SelectedRows[0].DataBoundItem is SavingsGoal goal)
+                SavingsDepositRequested.Invoke(this, (goal.Id, amount));
+
+            textBoxDepositAmount.Clear();
+        }
+
+        private void btnDeleteSavingsGoal_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewSavings.SelectedRows.Count == 0)
+            { ShowError("Виберіть ціль для видалення"); return; }
+
+            if (MessageBox.Show("Видалити обрану ціль?", "Підтвердження",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes
+                && dataGridViewSavings.SelectedRows[0].DataBoundItem is SavingsGoal goal)
+                SavingsGoalDeleteRequested.Invoke(this, goal.Id);
+        }
+
+        private void btnAddBudgetLimit_Click(object sender, EventArgs e)
+        {
+            if (comboBoxBudgetCategory.SelectedIndex == -1)
+            { ShowError("Виберіть категорію"); return; }
+
+            if (!decimal.TryParse(textBoxBudgetLimit.Text.Replace(",", "."),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal limit) || limit <= 0)
+            { ShowError("Введіть коректний ліміт"); return; }
+
+            BudgetLimitAddRequested.Invoke(this, new BudgetLimit
+            {
+                Category = comboBoxBudgetCategory.SelectedItem?.ToString() ?? string.Empty,
+                LimitAmount = limit,
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year
+            });
+
+            comboBoxBudgetCategory.SelectedIndex = -1;
+            textBoxBudgetLimit.Clear();
+        }
+
+        private void btnDeleteBudgetLimit_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewBudget.SelectedRows.Count == 0)
+            { ShowError("Виберіть ліміт для видалення"); return; }
+
+            if (MessageBox.Show("Видалити обраний ліміт?", "Підтвердження",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes
+                && dataGridViewBudget.SelectedRows[0].DataBoundItem is BudgetLimit b)
+                BudgetLimitDeleteRequested.Invoke(this, b.Id);
+        }
+
+        private void btnGenerateReport_Click(object sender, EventArgs e)
+            => ReportRequest.Invoke(this, "pdf");
     }
 }

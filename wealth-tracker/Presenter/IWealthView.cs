@@ -14,6 +14,9 @@ namespace wealth_tracker.Presenter
         void ShowPieChart(Dictionary<string, decimal> expensesByCategory);
         void ShowLineChart(List<(DateTime Date, decimal Balance)> timeline);
         void ShowWalletStatus(decimal balance);
+        void ShowSavingsGoals(IReadOnlyList<SavingsGoal> goals);
+        void ShowForecast(decimal forecast);
+        void ShowBudgetLimits(IReadOnlyList<BudgetLimit> limits);
 
         void ShowError(string message);
         void ShowSuccess(string message);
@@ -27,5 +30,11 @@ namespace wealth_tracker.Presenter
         event EventHandler<TransactionFilter> FilterChanged;
         event EventHandler ExportRequested;
         event EventHandler SaveXmlRequested;
+        event EventHandler<SavingsGoal> SavingsGoalAddRequested;
+        event EventHandler<Guid> SavingsGoalDeleteRequested;
+        event EventHandler<(Guid GoalId, decimal Amount)> SavingsDepositRequested;
+        event EventHandler<BudgetLimit> BudgetLimitAddRequested;
+        event EventHandler<Guid> BudgetLimitDeleteRequested;
+        event EventHandler<string> ReportRequest;
     }
 }

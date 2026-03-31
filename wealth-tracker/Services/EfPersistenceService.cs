@@ -16,7 +16,7 @@ namespace wealth_tracker.Services
         public EfPersistenceService(AppDbContext context)
         {
             _context = context;
-            _context.Database.EnsureCreated();
+            _context.Database.Migrate();
         }
 
         public async Task<List<Transaction>> LoadAsync()

@@ -15,6 +15,8 @@ namespace wealth_tracker.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<SavingsGoal> SavingsGoals { get; set; }
+        public DbSet<BudgetLimit> BudgetLimits { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
@@ -31,6 +33,28 @@ namespace wealth_tracker.Data
                 entity.Property(t => t.Amount).IsRequired();
                 entity.Property(t => t.Date).IsRequired();
                 entity.Property(t => t.Type).HasConversion<string>();
+            });
+
+            modelBuilder.Entity<SavingsGoal>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.TargetAmount).IsRequired();
+                entity.Property(e => e.Deadline).IsRequired();
+                entity.Ignore(e => e.Progress);
+                entity.Ignore(e => e.MonthlyRequired);
+                entity.Ignore(e => e.IsCompleted);
+            });
+
+            modelBuilder.Entity<BudgetLimit>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Category).IsRequired();
+                entity.Property(e => e.LimitAmount).IsRequired();
+                entity.Property(e => e.SpentAmount);
+                entity.Ignore(e => e.Remaining);
+                entity.Ignore(e => e.IsExceeded);
+                entity.Ignore(e => e.DailyAllowance);
             });
         }
     }
