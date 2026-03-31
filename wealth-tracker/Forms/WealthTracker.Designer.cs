@@ -387,7 +387,7 @@ namespace wealth_tracker
             numericRecurringDay.Maximum = new decimal(new int[] { 28, 0, 0, 0 });
             numericRecurringDay.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericRecurringDay.Name = "numericRecurringDay";
-            numericRecurringDay.Size = new Size(98, 30);
+            numericRecurringDay.Size = new Size(186, 30);
             numericRecurringDay.TabIndex = 13;
             numericRecurringDay.Value = new decimal(new int[] { 1, 0, 0, 0 });
             numericRecurringDay.Visible = false;
