@@ -158,6 +158,7 @@ namespace wealth_tracker.Presenter
             _view.ShowPieChart(_service.GetExpensesByCategory());
             _view.ShowLineChart(_service.GetBalanceTimeline());
             _view.ShowCombinedChart(_service.GetMonthlyChartData(), _service.GetForecastPoint());
+            _view.ShowSavingsChart(_savingsService.AllGoals);
             _view.ShowForecast(_service.GetMonthlyForecast());
             _view.ShowSavingsGoals(_savingsService.AllGoals);
             _view.ShowBudgetLimits(_budgetService.GetCurrentMonth());
@@ -246,7 +247,7 @@ namespace wealth_tracker.Presenter
         {
             try
             {
-                await _savingsService.DeleteAsync(id, _service, _persistence);
+                await _savingsService.DeleteAsync(id);
                 _view.ShowSuccess("Ціль видалено! Накопичені кошти повернуто на баланс.");
                 RefreshAll();
             }
@@ -260,7 +261,7 @@ namespace wealth_tracker.Presenter
         {
             try
             {
-                await _savingsService.DepositAsync(args.GoalId, args.Amount, _service, _persistence);
+                await _savingsService.DepositAsync(args.GoalId, args.Amount);
                 _view.ShowSuccess($"Поповнено на {args.Amount:N2} ₴!");
                 RefreshAll();
             }

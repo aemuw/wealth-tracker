@@ -110,6 +110,65 @@ namespace wealth_tracker
             }
         }
 
+        public void ShowSavingsChart(IReadOnlyList<SavingsGoal> goals)
+        {
+            if (chartSavings.Series.Count == 0)
+                InitializeSavingsChart();
+
+            chartSavings.Series["Накопичено"].Points.Clear();
+            chartSavings.Series["Ціль"].Points.Clear();
+
+            foreach (var g in goals)
+            {
+                chartSavings.Series["Накопичено"].Points.AddXY(g.Name, (double)g.SavedAmount);
+                chartSavings.Series["Ціль"].Points.AddXY(g.Name, (double)g.TargetAmount);
+            }
+        }
+
+        private void InitializeSavingsChart()
+        {
+            chartSavings.Series.Clear();
+            chartSavings.ChartAreas.Clear();
+            chartSavings.Legends.Clear();
+            chartSavings.Titles.Clear();
+
+            var area = new ChartArea("SavingsArea");
+            area.BackColor = Color.White;
+            area.AxisX.LabelStyle.Font = new Font("Segoe UI", 8F);
+            area.AxisY.LabelStyle.Format = "N0";
+            area.AxisY.Title = "Сума (₴)";
+            area.AxisY.TitleFont = new Font("Segoe UI", 9F, FontStyle.Bold);
+            area.AxisY.MajorGrid.LineColor = Color.FromArgb(220, 220, 220);
+            chartSavings.ChartAreas.Add(area);
+
+            var savedSeries = new Series("Накопичено");
+            savedSeries.ChartType = SeriesChartType.Column;
+            savedSeries.Color = Color.FromArgb(46, 204, 113);
+            savedSeries.IsValueShownAsLabel = true;
+            savedSeries.LabelFormat = "N0";
+            chartSavings.Series.Add(savedSeries);
+
+            var targetSeries = new Series("Ціль");
+            targetSeries.ChartType = SeriesChartType.Column;
+            targetSeries.Color = Color.FromArgb(52, 152, 219);
+            targetSeries.IsValueShownAsLabel = true;
+            targetSeries.LabelFormat = "N0";
+            chartSavings.Series.Add(targetSeries);
+
+            var legend = new Legend("SavingsLegend");
+            legend.Docking = Docking.Bottom;
+            legend.Font = new Font("Segoe UI", 9F);
+            legend.BackColor = Color.Transparent;
+            chartSavings.Legends.Add(legend);
+
+            chartSavings.Titles.Add(new Title("Прогрес заощаджень")
+            {
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 73, 94)
+            });
+            chartSavings.BackColor = Color.Transparent;
+        }
+
         public void ShowLineChart(List<(DateTime Date, decimal Balance)> timeline)
         {
             chartLine.Series["Баланс"].Points.Clear();
@@ -505,12 +564,24 @@ namespace wealth_tracker
         private void btnAddSavingsGoal_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBoxSavingsName.Text))
-            { ShowError("Введіть назву цілі"); return; }
+            {
+                ShowError("Введіть назву цілі");
+                return; 
+            }
 
             if (!decimal.TryParse(textBoxSavingsTarget.Text.Replace(",", "."),
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out decimal target) || target <= 0)
-            { ShowError("Введіть коректну суму цілі"); return; }
+            { 
+                ShowError("Введіть коректну суму цілі"); 
+                return;
+            }
+
+            if (dateTimePickerSavingsDeadline.Value.Date <= DateTime.Now.Date.AddDays(1))
+            {
+                ShowError("Дедлайн має бути не раніше ніж післязавтра");
+                return;
+            }
 
             SavingsGoalAddRequested.Invoke(this, new SavingsGoal
             {
@@ -529,12 +600,18 @@ namespace wealth_tracker
         private void btnDeposit_Click(object sender, EventArgs e)
         {
             if (dataGridViewSavings.SelectedRows.Count == 0)
-            { ShowError("Виберіть ціль для поповнення"); return; }
+            {
+                ShowError("Виберіть ціль для поповнення");
+                return; 
+            }
 
             if (!decimal.TryParse(textBoxDepositAmount.Text.Replace(",", "."),
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out decimal amount) || amount <= 0)
-            { ShowError("Введіть коректну суму"); return; }
+            { 
+                ShowError("Введіть коректну суму"); 
+                return; 
+            }
 
             if (dataGridViewSavings.SelectedRows[0].DataBoundItem is SavingsGoal goal)
                 SavingsDepositRequested.Invoke(this, (goal.Id, amount));

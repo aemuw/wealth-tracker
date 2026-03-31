@@ -25,36 +25,25 @@ namespace wealth_tracker.Services
 
         public async Task AddAsync(SavingsGoal goal)
         {
-            if (goal == null) throw new ArgumentNullException(nameof(goal));
+            if (goal == null) 
+                throw new ArgumentNullException(nameof(goal));
             _context.SavingsGoals.Add(goal);
             await _context.SaveChangesAsync();
             _goals.Add(goal);
         }
 
-        public async Task DeleteAsync(Guid id, TransactionService transactionService, IPersistenceService persistence)
+        public async Task DeleteAsync(Guid id)
         {
             var goal = _goals.FirstOrDefault(g => g.Id == id);
-            if (goal == null) return;
-
-            if (goal.SavedAmount > 0)
-            {
-                var refund = new Transaction
-                {
-                    Date = DateTime.Now,
-                    Category = "Повернення заощаджень",
-                    Amount = goal.SavedAmount,
-                    Type = TransactionType.Income,
-                    Note = $"Повернення з тумбочки: {goal.Name}"
-                };
-                transactionService.Add(refund);
-                await persistence.SaveAsync(refund);
-            }
+            if (goal == null) 
+                return;
 
             _context.SavingsGoals.Remove(goal);
             await _context.SaveChangesAsync();
             _goals.Remove(goal);
         }
-        public async Task DepositAsync(Guid id, decimal amount, TransactionService transactionService, IPersistenceService persistence)
+
+        public async Task DepositAsync(Guid id, decimal amount)
         {
             if (amount <= 0)
                 throw new ArgumentException("Сума має бути більше 0");
@@ -64,17 +53,6 @@ namespace wealth_tracker.Services
 
             if (goal.IsCompleted)
                 throw new InvalidOperationException("Ціль вже досягнута");
-
-            var expense = new Transaction
-            {
-                Date = DateTime.Now,
-                Category = "Заощадження",
-                Amount = amount,
-                Type = TransactionType.Expense,
-                Note = $"Тумбочка: {goal.Name}"
-            };
-            transactionService.Add(expense);
-            await persistence.SaveAsync(expense);
 
             goal.SavedAmount += amount;
 

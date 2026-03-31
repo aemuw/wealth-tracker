@@ -12,7 +12,9 @@ namespace wealth_tracker.Models
     public enum TransactionType
     {
         Income, 
-        Expense
+        Expense,
+        TransferToSavings,
+        TransferFromSavings
     }
 
     // Note: INotifyPropertyChanged is a UI concern and ideally should not be
