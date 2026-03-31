@@ -414,14 +414,14 @@ namespace wealth_tracker
             ((System.ComponentModel.ISupportInitialize)chartPie).BeginInit();
             chartPie.Location = new Point(10, 10);
             chartPie.Name = "chartPie";
-            chartPie.Size = new Size(650, 630);
+            chartPie.Size = new Size(430, 630);
             chartPie.TabIndex = 0;
             ((System.ComponentModel.ISupportInitialize)chartPie).EndInit();
 
             ((System.ComponentModel.ISupportInitialize)chartLine).BeginInit();
-            chartLine.Location = new Point(670, 10);
+            chartLine.Location = new Point(450, 10);
             chartLine.Name = "chartLine";
-            chartLine.Size = new Size(410, 630);
+            chartLine.Size = new Size(630, 630);
             chartLine.TabIndex = 1;
             ((System.ComponentModel.ISupportInitialize)chartLine).EndInit();
 

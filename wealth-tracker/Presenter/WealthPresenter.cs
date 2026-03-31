@@ -130,6 +130,7 @@ namespace wealth_tracker.Presenter
             _view.ShowTransactions(_service.GetFiltered(_currentFilter));
             _view.ShowPieChart(_service.GetExpensesByCategory());
             _view.ShowLineChart(_service.GetBalanceTimeline());
+            _view.ShowCombinedChart(_service.GetMonthlyChartData(), _service.GetForecastPoint());
             _view.ShowForecast(_service.GetMonthlyForecast());
             _view.ShowSavingsGoals(_savingsService.AllGoals);
             _view.ShowBudgetLimits(_budgetService.GetCurrentMonth());
@@ -303,7 +304,5 @@ namespace wealth_tracker.Presenter
                 _view.ShowError($"Помилка звіту: {ex.Message}");
             }
         }
-
-
     }
 }

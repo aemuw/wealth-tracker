@@ -94,5 +94,45 @@ namespace wealth_tracker.Services
 
             return currentBalance - avgPerDay * daysLeft;
         }
+
+        public List<(string Label, decimal Income, decimal Expense, decimal Balance)> GetMonthlyChartData()
+        {
+            var now = DateTime.Now;
+            var result = new List<(string, decimal, decimal, decimal)>();
+            decimal runningBalance = 0;
+
+            for (int i = 5; i >= 0; i--)
+            {
+                var date = now.AddMonths(-i);
+                var label = date.ToString("MMM yyyy");
+
+                var income = _transactions
+                    .Where(t =>
+                    t.Type == TransactionType.Income &&
+                    t.Date.Month == date.Month &&
+                    t.Date.Year == date.Year)
+                    .Sum(t => t.Amount);
+
+                var expense = _transactions
+                    .Where(t =>
+                    t.Type == TransactionType.Expense &&
+                    t.Date.Month == date.Month &&
+                    t.Date.Year == date.Year)
+                    .Sum(t => t.Amount);
+
+                runningBalance += income - expense;
+                result.Add((label, income, expense, runningBalance));
+            }
+            return result;
+        }
+
+        public (string Label, decimal ForecastBalance) GetForecastPoint()
+        {
+            var now = DateTime.Now;
+            var daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
+            var forecast = GetMonthlyForecast();
+            var label = new DateTime(now.Year, now.Month, daysInMonth).ToString("MMM yyyy") + "*";  
+            return (label, forecast);
+        }
     }
 }

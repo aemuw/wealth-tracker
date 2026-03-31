@@ -317,29 +317,57 @@ namespace wealth_tracker
             chartLine.Legends.Clear();
             chartLine.Titles.Clear();
 
-            var area = new ChartArea("LineArea");
+            var area = new ChartArea("CombinedArea");
             area.BackColor = Color.White;
             area.AxisX.LabelStyle.Angle = -45;
             area.AxisX.LabelStyle.Font = new Font("Segoe UI", 8F);
             area.AxisY.LabelStyle.Format = "N0";
-            area.AxisY.Title = "Баланс (₴)";
-            area.AxisX.Title = "Дата";
+            area.AxisY.Title = "Сума (₴)";
+            area.AxisX.Title = "Місяць";
             area.AxisY.TitleFont = new Font("Segoe UI", 9F, FontStyle.Bold);
             area.AxisX.TitleFont = new Font("Segoe UI", 9F, FontStyle.Bold);
+            area.AxisY.MajorGrid.LineColor = Color.FromArgb(220, 220, 220);
             chartLine.ChartAreas.Add(area);
 
-            var series = new Series("Баланс");
-            series.ChartType = SeriesChartType.Line;
-            series.Color = Color.FromArgb(52, 152, 219);
-            series.BorderWidth = 3;
-            series.MarkerStyle = MarkerStyle.Circle;
-            series.MarkerSize = 7;
-            series.MarkerColor = Color.FromArgb(41, 128, 185);
-            chartLine.Series.Add(series);
+            var incSeries = new Series("Доходи");
+            incSeries.ChartType = SeriesChartType.Column;
+            incSeries.Color = Color.FromArgb(46, 204, 113);
+            incSeries.IsValueShownAsLabel = false;
+            chartLine.Series.Add(incSeries);
 
-            chartLine.Titles.Add(new Title("Динаміка балансу")
+            var expSeries = new Series("Витрати");
+            expSeries.ChartType = SeriesChartType.Column;
+            expSeries.Color = Color.FromArgb(231, 76, 60);
+            expSeries.IsValueShownAsLabel = false;
+            chartLine.Series.Add(expSeries);
+
+            var balSeries = new Series("Баланс");
+            balSeries.ChartType = SeriesChartType.Line;
+            balSeries.Color = Color.FromArgb(52, 152, 219);
+            balSeries.BorderWidth = 3;
+            balSeries.MarkerStyle = MarkerStyle.Circle;
+            balSeries.MarkerSize = 8;
+            balSeries.MarkerColor = Color.FromArgb(41, 128, 185);
+            chartLine.Series.Add(balSeries);
+
+            var forecastSeries = new Series("Прогноз");
+            forecastSeries.ChartType = SeriesChartType.Line;
+            forecastSeries.Color = Color.FromArgb(243, 156, 18);
+            forecastSeries.BorderWidth = 2;
+            forecastSeries.BorderDashStyle = ChartDashStyle.Dash;
+            forecastSeries.MarkerStyle = MarkerStyle.Diamond;
+            forecastSeries.MarkerSize = 8;
+            chartLine.Series.Add(forecastSeries);
+
+            var legend = new Legend("Legend");
+            legend.Docking = Docking.Bottom;
+            legend.Font = new Font("Segoe UI", 9F);
+            legend.BackColor = Color.Transparent;
+            chartLine.Legends.Add(legend);
+
+            chartLine.Titles.Add(new Title("Доходи / Витрати / Баланс по місяцях")
             {
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(52, 73, 94)
             });
             chartLine.BackColor = Color.Transparent;
@@ -530,5 +558,30 @@ namespace wealth_tracker
 
         private void btnGenerateReport_Click(object sender, EventArgs e)
             => ReportRequest.Invoke(this, "pdf");
+
+        public void ShowCombinedChart(List<(string Label, decimal Income, decimal Expense, decimal Balance)> data,
+                                        (string Label, decimal ForecastBalance) forecast)
+        {
+            chartLine.Series["Доходи"].Points.Clear();
+            chartLine.Series["Витрати"].Points.Clear();
+            chartLine.Series["Баланс"].Points.Clear();
+            chartLine.Series["Прогноз"].Points.Clear();
+
+            foreach (var (label, income, expense, balance) in data)
+            {
+                chartLine.Series["Доходи"].Points.AddXY(label, (double)income);
+                chartLine.Series["Витрати"].Points.AddXY(label, (double)expense);
+                chartLine.Series["Баланс"].Points.AddXY(label, (double)balance);
+            }
+
+            if (data.Count > 0)
+            {
+                var lastLabel = data[^1].Label;
+                var lastBalance = (double)data[^1].Balance;
+
+                chartLine.Series["Прогноз"].Points.AddXY(lastLabel, lastBalance);
+                chartLine.Series["Прогноз"].Points.AddXY(forecast.Label, (double)forecast.ForecastBalance);
+            }
+        }
     }
 }

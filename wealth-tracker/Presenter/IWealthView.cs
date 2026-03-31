@@ -13,6 +13,7 @@ namespace wealth_tracker.Presenter
         void ShowTransactions(IReadOnlyList<Transaction> transaction);
         void ShowPieChart(Dictionary<string, decimal> expensesByCategory);
         void ShowLineChart(List<(DateTime Date, decimal Balance)> timeline);
+        void ShowCombinedChart(List<(string Label, decimal Income, decimal Expense, decimal Balance)> data, (string Label, decimal ForecastBalance) forecast);
         void ShowWalletStatus(decimal balance);
         void ShowSavingsGoals(IReadOnlyList<SavingsGoal> goals);
         void ShowForecast(decimal forecast);
