@@ -727,7 +727,7 @@ namespace wealth_tracker
             groupBoxDeposit.Margin = new Padding(3, 4, 3, 4);
             groupBoxDeposit.Name = "groupBoxDeposit";
             groupBoxDeposit.Padding = new Padding(3, 4, 3, 4);
-            groupBoxDeposit.Size = new Size(571, 107);
+            groupBoxDeposit.Size = new Size(571, 152);
             groupBoxDeposit.TabIndex = 2;
             groupBoxDeposit.TabStop = false;
             groupBoxDeposit.Text = "Поповнити обрану ціль";
@@ -747,8 +747,9 @@ namespace wealth_tracker
             textBoxDepositAmount.Font = new Font("Segoe UI", 10F);
             textBoxDepositAmount.Location = new Point(17, 61);
             textBoxDepositAmount.Margin = new Padding(3, 4, 3, 4);
+            textBoxDepositAmount.Multiline = true;
             textBoxDepositAmount.Name = "textBoxDepositAmount";
-            textBoxDepositAmount.Size = new Size(182, 30);
+            textBoxDepositAmount.Size = new Size(182, 63);
             textBoxDepositAmount.TabIndex = 1;
             // 
             // btnDeposit
@@ -762,7 +763,7 @@ namespace wealth_tracker
             btnDeposit.Location = new Point(217, 57);
             btnDeposit.Margin = new Padding(3, 4, 3, 4);
             btnDeposit.Name = "btnDeposit";
-            btnDeposit.Size = new Size(331, 40);
+            btnDeposit.Size = new Size(331, 67);
             btnDeposit.TabIndex = 2;
             btnDeposit.Text = "Відкласти в тумбочку";
             btnDeposit.UseVisualStyleBackColor = false;
@@ -776,10 +777,10 @@ namespace wealth_tracker
             btnDeleteSavingsGoal.FlatStyle = FlatStyle.Flat;
             btnDeleteSavingsGoal.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnDeleteSavingsGoal.ForeColor = Color.White;
-            btnDeleteSavingsGoal.Location = new Point(1006, 727);
+            btnDeleteSavingsGoal.Location = new Point(999, 737);
             btnDeleteSavingsGoal.Margin = new Padding(3, 4, 3, 4);
             btnDeleteSavingsGoal.Name = "btnDeleteSavingsGoal";
-            btnDeleteSavingsGoal.Size = new Size(225, 79);
+            btnDeleteSavingsGoal.Size = new Size(232, 135);
             btnDeleteSavingsGoal.TabIndex = 3;
             btnDeleteSavingsGoal.Text = "Видалити ціль";
             btnDeleteSavingsGoal.UseVisualStyleBackColor = false;
@@ -897,10 +898,10 @@ namespace wealth_tracker
             btnDeleteBudgetLimit.FlatStyle = FlatStyle.Flat;
             btnDeleteBudgetLimit.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnDeleteBudgetLimit.ForeColor = Color.White;
-            btnDeleteBudgetLimit.Location = new Point(1006, 727);
+            btnDeleteBudgetLimit.Location = new Point(1004, 735);
             btnDeleteBudgetLimit.Margin = new Padding(3, 4, 3, 4);
             btnDeleteBudgetLimit.Name = "btnDeleteBudgetLimit";
-            btnDeleteBudgetLimit.Size = new Size(225, 79);
+            btnDeleteBudgetLimit.Size = new Size(228, 120);
             btnDeleteBudgetLimit.TabIndex = 2;
             btnDeleteBudgetLimit.Text = "Видалити ліміт";
             btnDeleteBudgetLimit.UseVisualStyleBackColor = false;
@@ -914,10 +915,10 @@ namespace wealth_tracker
             btnGenerateReport.FlatStyle = FlatStyle.Flat;
             btnGenerateReport.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnGenerateReport.ForeColor = Color.White;
-            btnGenerateReport.Location = new Point(11, 727);
+            btnGenerateReport.Location = new Point(14, 735);
             btnGenerateReport.Margin = new Padding(3, 4, 3, 4);
             btnGenerateReport.Name = "btnGenerateReport";
-            btnGenerateReport.Size = new Size(343, 79);
+            btnGenerateReport.Size = new Size(228, 120);
             btnGenerateReport.TabIndex = 3;
             btnGenerateReport.Text = "Згенерувати PDF звіт";
             btnGenerateReport.UseVisualStyleBackColor = false;
