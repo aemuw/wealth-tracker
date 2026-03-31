@@ -25,17 +25,16 @@ namespace wealth_tracker.Models
 
         public decimal Progress => TargetAmount > 0 ? Math.Min(SavedAmount / TargetAmount * 100, 100) : 0;
 
-        public bool IsCompleted => SavedAmount >= TargetAmount;
+        public bool IsCompleted => TargetAmount > 0 && SavedAmount >= TargetAmount;
 
         public decimal MonthlyRequired
         {
-            get 
+            get
             {
                 var monthsLeft = ((Deadline.Year - DateTime.Now.Year) * 12) + Deadline.Month - DateTime.Now.Month;
                 if (monthsLeft <= 0)
                     return Math.Max(TargetAmount - SavedAmount, 0);
-
-                return Math.Max(TargetAmount = SavedAmount, 0) / monthsLeft;
+                return Math.Max(TargetAmount - SavedAmount, 0) / monthsLeft; 
             }
         }
     }

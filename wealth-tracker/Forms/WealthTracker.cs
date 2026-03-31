@@ -19,11 +19,12 @@ namespace wealth_tracker
         public event EventHandler<BudgetLimit> BudgetLimitAddRequested = delegate { };
         public event EventHandler<Guid> BudgetLimitDeleteRequested = delegate { };
         public event EventHandler<string> ReportRequest = delegate { };
+        public event EventHandler<(Guid FromId, Guid ToId, decimal Amount)> SavingsTransferRequested = delegate { };
 
         private static readonly string[] _expenseCategories =
         {
             "Їжа", "Транспорт", "Комунальні", "Розваги", "Одяг",
-            "Здоров'я", "Освіта", "Спорт", "Подарунки", "Інше"
+            "Здоров'я", "Освіта", "Спорт", "Подарунки", "Інше" 
         };
 
         private static readonly string[] _incomeCategories =
@@ -433,14 +434,19 @@ namespace wealth_tracker
                 InitializeSavingsGrid();
 
             dataGridViewSavings.DataSource = null;
-            dataGridViewSavings.DataSource = new System.ComponentModel.BindingList<SavingsGoal>(
-                new List<SavingsGoal>(goals));
+            dataGridViewSavings.DataSource = new System.ComponentModel.BindingList<SavingsGoal>(new List<SavingsGoal>(goals));
 
             foreach (DataGridViewRow row in dataGridViewSavings.Rows)
                 if (row.DataBoundItem is SavingsGoal g)
                     row.DefaultCellStyle.BackColor = g.IsCompleted
                         ? Color.FromArgb(212, 239, 223)
                         : Color.White;
+
+            comboBoxTransferTo.DataSource = null;
+            comboBoxTransferTo.DataSource = new List<SavingsGoal>(goals);
+            comboBoxTransferTo.DisplayMember = "Name";
+            comboBoxTransferTo.ValueMember = "Id";
+            comboBoxTransferTo.SelectedIndex = -1;
         }
 
         public void ShowBudgetLimits(IReadOnlyList<BudgetLimit> limits)
@@ -539,7 +545,10 @@ namespace wealth_tracker
         private void btnDeleteSavingsGoal_Click(object sender, EventArgs e)
         {
             if (dataGridViewSavings.SelectedRows.Count == 0)
-            { ShowError("Виберіть ціль для видалення"); return; }
+            { 
+                ShowError("Виберіть ціль для видалення"); 
+                return; 
+            }
 
             if (MessageBox.Show("Видалити обрану ціль?", "Підтвердження",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes
@@ -550,12 +559,18 @@ namespace wealth_tracker
         private void btnAddBudgetLimit_Click(object sender, EventArgs e)
         {
             if (comboBoxBudgetCategory.SelectedIndex == -1)
-            { ShowError("Виберіть категорію"); return; }
+            { 
+                ShowError("Виберіть категорію");
+                return; 
+            }
 
             if (!decimal.TryParse(textBoxBudgetLimit.Text.Replace(",", "."),
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out decimal limit) || limit <= 0)
-            { ShowError("Введіть коректний ліміт"); return; }
+            {
+                ShowError("Введіть коректний ліміт"); 
+                return; 
+            }
 
             BudgetLimitAddRequested.Invoke(this, new BudgetLimit
             {
@@ -569,10 +584,50 @@ namespace wealth_tracker
             textBoxBudgetLimit.Clear();
         }
 
+        private void btnTransfer_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewSavings.SelectedRows.Count == 0)
+            { 
+                ShowError("Виберіть ціль-джерело в таблиці");
+                return; 
+            }
+
+            if (comboBoxTransferTo.SelectedIndex == -1)
+            { 
+                ShowError("Виберіть ціль призначення");
+                return; 
+            }
+
+            if (!decimal.TryParse(textBoxTransferAmount.Text.Replace(",", "."),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal amount) || amount <= 0)
+            { 
+                ShowError("Введіть коректну суму");
+                return;
+            }
+
+            if (dataGridViewSavings.SelectedRows[0].DataBoundItem is SavingsGoal from &&
+                comboBoxTransferTo.SelectedItem is SavingsGoal to)
+            {
+                if (from.Id == to.Id)
+                { 
+                    ShowError("Не можна переказати в ту саму ціль"); 
+                    return; 
+                }
+
+                SavingsTransferRequested.Invoke(this, (from.Id, to.Id, amount));
+                textBoxTransferAmount.Clear();
+                comboBoxTransferTo.SelectedIndex = -1;
+            }
+        }
+
         private void btnDeleteBudgetLimit_Click(object sender, EventArgs e)
         {
             if (dataGridViewBudget.SelectedRows.Count == 0)
-            { ShowError("Виберіть ліміт для видалення"); return; }
+            { 
+                ShowError("Виберіть ліміт для видалення"); 
+                return; 
+            }
 
             if (MessageBox.Show("Видалити обраний ліміт?", "Підтвердження",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes

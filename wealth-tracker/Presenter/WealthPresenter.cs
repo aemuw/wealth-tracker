@@ -34,7 +34,7 @@ namespace wealth_tracker.Presenter
 
             _view.BudgetLimitAddRequested += OnBugetLimitAdd;
             _view.BudgetLimitDeleteRequested += OnBudgetLimitDelete;
-
+            _view.SavingsTransferRequested += OnSavingsTransfer;
             _view.ReportRequest += OnReportRequest;
         }
 
@@ -246,8 +246,8 @@ namespace wealth_tracker.Presenter
         {
             try
             {
-                await _savingsService.DeleteAsync(id);
-                _view.ShowSuccess("Ціль видалено!");
+                await _savingsService.DeleteAsync(id, _service, _persistence);
+                _view.ShowSuccess("Ціль видалено! Накопичені кошти повернуто на баланс.");
                 RefreshAll();
             }
             catch (Exception ex)
@@ -260,8 +260,22 @@ namespace wealth_tracker.Presenter
         {
             try
             {
-                await _savingsService.DepositAsync(args.GoalId, args.Amount);
+                await _savingsService.DepositAsync(args.GoalId, args.Amount, _service, _persistence);
                 _view.ShowSuccess($"Поповнено на {args.Amount:N2} ₴!");
+                RefreshAll();
+            }
+            catch (Exception ex)
+            {
+                _view.ShowError($"Помилка: {ex.Message}");
+            }
+        }
+
+        private async void OnSavingsTransfer(object? sender, (Guid FromId, Guid ToId, decimal Amount) args)
+        {
+            try
+            {
+                await _savingsService.TransferAsync(args.FromId, args.ToId, args.Amount);
+                _view.ShowSuccess($"Переказано {args.Amount:N2} ₴!");
                 RefreshAll();
             }
             catch (Exception ex)

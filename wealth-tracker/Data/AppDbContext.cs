@@ -39,7 +39,11 @@ namespace wealth_tracker.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired();
-                entity.Property(e => e.TargetAmount).IsRequired();
+                entity.Property(e => e.TargetAmount)
+                    .IsRequired()
+                    .HasConversion<double>(); 
+                entity.Property(e => e.SavedAmount)
+                    .HasConversion<double>(); 
                 entity.Property(e => e.Deadline).IsRequired();
                 entity.Ignore(e => e.Progress);
                 entity.Ignore(e => e.MonthlyRequired);
@@ -50,8 +54,12 @@ namespace wealth_tracker.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Category).IsRequired();
-                entity.Property(e => e.LimitAmount).IsRequired();
-                entity.Property(e => e.SpentAmount);
+                entity.Property(e => e.LimitAmount)
+                    .IsRequired()
+                    .HasConversion<double>(); 
+                entity.Property(e => e.Month).IsRequired();
+                entity.Property(e => e.Year).IsRequired();
+                entity.Ignore(e => e.SpentAmount);  
                 entity.Ignore(e => e.Remaining);
                 entity.Ignore(e => e.IsExceeded);
                 entity.Ignore(e => e.DailyAllowance);

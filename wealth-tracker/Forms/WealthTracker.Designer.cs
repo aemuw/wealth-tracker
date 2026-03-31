@@ -108,6 +108,7 @@ namespace wealth_tracker
             tabControlMain.Controls.Add(tabPageTransactions);
             tabControlMain.Controls.Add(tabPageAnalytics);
             tabControlMain.Controls.Add(tabPageSavings);
+            tabPageSavings.Controls.Add(groupBoxTransfer);
             tabControlMain.Controls.Add(tabPageBudget);
             tabControlMain.Dock = DockStyle.Fill;
             tabControlMain.Font = new Font("Segoe UI", 10F);
@@ -610,6 +611,58 @@ namespace wealth_tracker
             tabPageSavings.Size = new Size(1249, 889);
             tabPageSavings.TabIndex = 3;
             tabPageSavings.Text = "Тумбочка";
+            // groupBoxTransfer
+            groupBoxTransfer = new GroupBox();
+            groupBoxTransfer.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            groupBoxTransfer.Location = new Point(590, 720);
+            groupBoxTransfer.Name = "groupBoxTransfer";
+            groupBoxTransfer.Size = new Size(630, 107);
+            groupBoxTransfer.Text = "Переказ між цілями";
+
+            labelTransferTo = new Label();
+            labelTransferTo.AutoSize = true;
+            labelTransferTo.Font = new Font("Segoe UI", 9F);
+            labelTransferTo.Location = new Point(15, 28);
+            labelTransferTo.Text = "В ціль:";
+
+            comboBoxTransferTo = new ComboBox();
+            comboBoxTransferTo.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxTransferTo.Font = new Font("Segoe UI", 10F);
+            comboBoxTransferTo.Location = new Point(15, 50);
+            comboBoxTransferTo.Name = "comboBoxTransferTo";
+            comboBoxTransferTo.Size = new Size(220, 25);
+
+            labelTransferAmount = new Label();
+            labelTransferAmount.AutoSize = true;
+            labelTransferAmount.Font = new Font("Segoe UI", 9F);
+            labelTransferAmount.Location = new Point(250, 28);
+            labelTransferAmount.Text = "Сума (₴):";
+
+            textBoxTransferAmount = new TextBox();
+            textBoxTransferAmount.Font = new Font("Segoe UI", 10F);
+            textBoxTransferAmount.Location = new Point(250, 50);
+            textBoxTransferAmount.Name = "textBoxTransferAmount";
+            textBoxTransferAmount.Size = new Size(140, 25);
+
+            btnTransfer = new Button();
+            btnTransfer.BackColor = Color.FromArgb(52, 152, 219);
+            btnTransfer.Cursor = Cursors.Hand;
+            btnTransfer.FlatAppearance.BorderSize = 0;
+            btnTransfer.FlatStyle = FlatStyle.Flat;
+            btnTransfer.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnTransfer.ForeColor = Color.White;
+            btnTransfer.Location = new Point(405, 46);
+            btnTransfer.Name = "btnTransfer";
+            btnTransfer.Size = new Size(210, 34);
+            btnTransfer.Text = "Переказати";
+            btnTransfer.UseVisualStyleBackColor = false;
+            btnTransfer.Click += btnTransfer_Click;
+            
+            groupBoxTransfer.Controls.Add(labelTransferTo);
+            groupBoxTransfer.Controls.Add(comboBoxTransferTo);
+            groupBoxTransfer.Controls.Add(labelTransferAmount);
+            groupBoxTransfer.Controls.Add(textBoxTransferAmount);
+            groupBoxTransfer.Controls.Add(btnTransfer);
             // 
             // groupBoxAddSavings
             // 
@@ -1041,11 +1094,16 @@ namespace wealth_tracker
         private Button btnAddSavingsGoal;
         private DataGridView dataGridViewSavings;
         private GroupBox groupBoxDeposit;
+        private GroupBox groupBoxTransfer;
+        private Label labelTransferTo;
+        private ComboBox comboBoxTransferTo;
+        private Label labelTransferAmount;
+        private TextBox textBoxTransferAmount;
+        private Button btnTransfer;
         private Label labelDepositAmount;
         private TextBox textBoxDepositAmount;
         private Button btnDeposit;
         private Button btnDeleteSavingsGoal;
-
         private TabPage tabPageBudget;
         private GroupBox groupBoxAddBudget;
         private Label labelBudgetCategory;

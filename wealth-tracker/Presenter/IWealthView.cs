@@ -37,5 +37,6 @@ namespace wealth_tracker.Presenter
         event EventHandler<BudgetLimit> BudgetLimitAddRequested;
         event EventHandler<Guid> BudgetLimitDeleteRequested;
         event EventHandler<string> ReportRequest;
+        event EventHandler<(Guid FromId, Guid ToId, decimal Amount)> SavingsTransferRequested;
     }
 }
