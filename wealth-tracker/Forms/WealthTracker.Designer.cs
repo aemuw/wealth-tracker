@@ -81,6 +81,8 @@ namespace wealth_tracker
             btnAddBudgetLimit = new Button();
             dataGridViewBudget = new DataGridView();
             btnDeleteBudgetLimit = new Button();
+            chartPie = new Chart();
+            chartLine = new Chart();
             btnGenerateReport = new Button();
             tabControlMain.SuspendLayout();
             tabPageDashboard.SuspendLayout();
@@ -559,6 +561,31 @@ namespace wealth_tracker
             btnFilter.TabIndex = 6;
             btnFilter.Text = "Фільтр";
             btnFilter.Click += btnFilter_Click;
+
+            // chartPie
+            chartPie = new Chart();
+            ((System.ComponentModel.ISupportInitialize)chartPie).BeginInit();
+            chartPie.Location = new Point(11, 13);
+            chartPie.Name = "chartPie";
+            chartPie.Size = new Size(490, 860);
+            chartPie.TabIndex = 0;
+            ((System.ComponentModel.ISupportInitialize)chartPie).EndInit();
+            //
+            // chartLine
+            //
+            chartLine = new Chart();
+            ((System.ComponentModel.ISupportInitialize)chartLine).BeginInit();
+            chartLine.Location = new Point(511, 13);
+            chartLine.Name = "chartLine";
+            chartLine.Size = new Size(727, 860);
+            chartLine.TabIndex = 1;
+            ((System.ComponentModel.ISupportInitialize)chartLine).EndInit();
+            //
+            // tabPageAnalytics
+            //
+            tabPageAnalytics.Controls.Add(chartPie);
+            tabPageAnalytics.Controls.Add(chartLine);
+            tabPageAnalytics.Location = new Point(4, 40);
             // 
             // tabPageAnalytics
             // 
