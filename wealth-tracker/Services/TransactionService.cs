@@ -96,33 +96,41 @@ namespace wealth_tracker.Services
             return currentBalance - avgPerDay * daysLeft;
         }
 
-        public List<(string Label, decimal Income, decimal Expense, decimal Balance)> GetMonthlyChartData()
+        public List<(string Label, decimal Income, decimal Expense, decimal Balance)> GetMonthlyChartData(decimal totalSaved = 0)
         {
             var now = DateTime.Now;
             var result = new List<(string, decimal, decimal, decimal)>();
             decimal runningBalance = 0;
 
-            for (int i = 5; i >= 0; i--)
+            var minDate = _transactions.Any() ? _transactions.Min(t => t.Date) : now;
+            var startDate = new DateTime(minDate.Year, minDate.Month, 1);
+            var endDate = new DateTime(now.Year, now.Month, 1);
+
+            var currentDate = startDate;
+
+            while (currentDate <= endDate)
             {
-                var date = now.AddMonths(-i);
-                var label = date.ToString("MMM yyyy");
+                var label = currentDate.ToString("MMM yyyy");
 
                 var income = _transactions
-                    .Where(t =>
-                    t.Type == TransactionType.Income &&
-                    t.Date.Month == date.Month &&
-                    t.Date.Year == date.Year)
+                    .Where(t => t.Type == TransactionType.Income && t.Date.Month == currentDate.Month && t.Date.Year == currentDate.Year)
                     .Sum(t => t.Amount);
 
                 var expense = _transactions
-                    .Where(t =>
-                    t.Type == TransactionType.Expense &&
-                    t.Date.Month == date.Month &&
-                    t.Date.Year == date.Year)
+                    .Where(t => t.Type == TransactionType.Expense && t.Date.Month == currentDate.Month && t.Date.Year == currentDate.Year)
                     .Sum(t => t.Amount);
 
                 runningBalance += income - expense;
-                result.Add((label, income, expense, runningBalance));
+
+                var displayBalance = runningBalance;
+                if (currentDate == endDate) 
+                    displayBalance -= totalSaved;
+
+                if (displayBalance < 0) 
+                    displayBalance = 0;
+
+                result.Add((label, income, expense, displayBalance));
+                currentDate = currentDate.AddMonths(1); 
             }
             return result;
         }
@@ -132,6 +140,10 @@ namespace wealth_tracker.Services
             var now = DateTime.Now;
             var daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
             var forecast = GetMonthlyForecast(totalSaved);
+
+            if (forecast < 0) 
+                forecast = 0;
+
             var label = new DateTime(now.Year, now.Month, daysInMonth).ToString("MMM yyyy") + "*";
             return (label, forecast);
         }

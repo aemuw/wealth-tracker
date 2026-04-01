@@ -174,6 +174,18 @@ namespace wealth_tracker
 
         private void InitializeSavingsChart()
         {
+            if (chartSavings == null)
+            {
+                chartSavings = new Chart();
+                ((System.ComponentModel.ISupportInitialize)(chartSavings)).BeginInit();
+                chartSavings.Location = new Point(580, 102);
+                chartSavings.Name = "chartSavings";
+                chartSavings.Size = new Size(365, 280);
+                chartSavings.TabStop = false;
+                if (tabPageSavings != null) tabPageSavings.Controls.Add(chartSavings);
+                ((System.ComponentModel.ISupportInitialize)(chartSavings)).EndInit();
+            }
+
             chartSavings.Series.Clear();
             chartSavings.ChartAreas.Clear();
             chartSavings.Legends.Clear();
@@ -405,6 +417,18 @@ namespace wealth_tracker
 
         private void InitializePieChart()
         {
+            if (chartPie == null)
+            {
+                chartPie = new Chart();
+                ((System.ComponentModel.ISupportInitialize)(chartPie)).BeginInit();
+                chartPie.Location = new Point(10, 10);
+                chartPie.Name = "chartPie";
+                chartPie.Size = new Size(450, 450);
+                chartPie.TabStop = false;
+                if (tabPageAnalytics != null) tabPageAnalytics.Controls.Add(chartPie);
+                ((System.ComponentModel.ISupportInitialize)(chartPie)).EndInit();
+            }
+
             chartPie.Series.Clear();
             chartPie.ChartAreas.Clear();
             chartPie.Legends.Clear();
@@ -443,6 +467,18 @@ namespace wealth_tracker
 
         private void InitializeLineChart()
         {
+            if (chartLine == null)
+            {
+                chartLine = new Chart();
+                ((System.ComponentModel.ISupportInitialize)(chartLine)).BeginInit();
+                chartLine.Location = new Point(470, 10);
+                chartLine.Name = "chartLine";
+                chartLine.Size = new Size(460, 450);
+                chartLine.TabStop = false;
+                if (tabPageAnalytics != null) tabPageAnalytics.Controls.Add(chartLine);
+                ((System.ComponentModel.ISupportInitialize)(chartLine)).EndInit();
+            }
+
             chartLine.Series.Clear();
             chartLine.ChartAreas.Clear();
             chartLine.Legends.Clear();
@@ -458,6 +494,9 @@ namespace wealth_tracker
             area.AxisY.TitleFont = new Font("Segoe UI", 9F, FontStyle.Bold);
             area.AxisX.TitleFont = new Font("Segoe UI", 9F, FontStyle.Bold);
             area.AxisY.MajorGrid.LineColor = Color.FromArgb(220, 220, 220);
+
+            area.AxisY.Minimum = 0; 
+
             chartLine.ChartAreas.Add(area);
 
             var incSeries = new Series("Доходи");
@@ -762,28 +801,42 @@ namespace wealth_tracker
         private void btnGenerateReport_Click(object sender, EventArgs e)
             => ReportRequest.Invoke(this, "pdf");
 
-        public void ShowCombinedChart(List<(string Label, decimal Income, decimal Expense, decimal Balance)> data,
-                                        (string Label, decimal ForecastBalance) forecast)
+        public void ShowCombinedChart(List<(string Label, decimal Income, decimal Expense, decimal Balance)> data, 
+            (string Label, decimal ForecastBalance) forecast)
         {
             chartLine.Series["Доходи"].Points.Clear();
             chartLine.Series["Витрати"].Points.Clear();
             chartLine.Series["Баланс"].Points.Clear();
             chartLine.Series["Прогноз"].Points.Clear();
 
+            int xIndex = 1;
+
             foreach (var (label, income, expense, balance) in data)
             {
-                chartLine.Series["Доходи"].Points.AddXY(label, (double)income);
-                chartLine.Series["Витрати"].Points.AddXY(label, (double)expense);
-                chartLine.Series["Баланс"].Points.AddXY(label, (double)balance);
+                var pInc = new DataPoint(xIndex, (double)income);
+                pInc.AxisLabel = label; 
+                chartLine.Series["Доходи"].Points.Add(pInc);
+
+                var pExp = new DataPoint(xIndex, (double)expense);
+                chartLine.Series["Витрати"].Points.Add(pExp);
+
+                var pBal = new DataPoint(xIndex, (double)balance);
+                chartLine.Series["Баланс"].Points.Add(pBal);
+
+                xIndex++; 
             }
 
             if (data.Count > 0)
             {
-                var lastLabel = data[^1].Label;
                 var lastBalance = (double)data[^1].Balance;
+                var forecastBal = (double)forecast.ForecastBalance;
 
-                chartLine.Series["Прогноз"].Points.AddXY(lastLabel, lastBalance);
-                chartLine.Series["Прогноз"].Points.AddXY(forecast.Label, (double)forecast.ForecastBalance);
+                var pForecastStart = new DataPoint(xIndex - 1, lastBalance);
+                chartLine.Series["Прогноз"].Points.Add(pForecastStart);
+
+                var pForecastEnd = new DataPoint(xIndex, forecastBal);
+                pForecastEnd.AxisLabel = forecast.Label;
+                chartLine.Series["Прогноз"].Points.Add(pForecastEnd);
             }
         }
     }
