@@ -52,7 +52,7 @@ namespace wealth_tracker.Services
             return query.OrderByDescending(c => c.Date).ToList();
         }
 
-        public WealthSummary GetSummary() => WealthSummary.Calculate(_transactions);
+        public WealthSummary GetSummary(decimal totalSaved = 0) => WealthSummary.Calculate(_transactions, totalSaved);
 
         public Dictionary<string, decimal> GetExpensesByCategory() => _transactions
             .Where(c => c.Type == TransactionType.Expense).GroupBy(c => c.Category)
@@ -74,10 +74,11 @@ namespace wealth_tracker.Services
             }
             return result;
         }
-        public decimal GetMonthlyForecast()
+
+        public decimal GetMonthlyForecast(decimal totalSaved = 0)
         {
             var now = DateTime.Now;
-            var currentBalance = GetSummary().Balance;
+            var currentBalance = GetSummary(totalSaved).Balance;
 
             var monthlyExpenses = _transactions
                 .Where(t => t.Type == TransactionType.Expense
@@ -86,10 +87,10 @@ namespace wealth_tracker.Services
                 .Sum(t => t.Amount);
 
             var daysPassed = now.Day;
-            if (daysPassed == 0) return currentBalance;
+            if (daysPassed == 0) 
+                return currentBalance;
 
             var avgPerDay = monthlyExpenses / daysPassed;
-
             var daysLeft = DateTime.DaysInMonth(now.Year, now.Month) - now.Day;
 
             return currentBalance - avgPerDay * daysLeft;
@@ -126,12 +127,12 @@ namespace wealth_tracker.Services
             return result;
         }
 
-        public (string Label, decimal ForecastBalance) GetForecastPoint()
+        public (string Label, decimal ForecastBalance) GetForecastPoint(decimal totalSaved = 0)
         {
             var now = DateTime.Now;
             var daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
-            var forecast = GetMonthlyForecast();
-            var label = new DateTime(now.Year, now.Month, daysInMonth).ToString("MMM yyyy") + "*";  
+            var forecast = GetMonthlyForecast(totalSaved);
+            var label = new DateTime(now.Year, now.Month, daysInMonth).ToString("MMM yyyy") + "*";
             return (label, forecast);
         }
 

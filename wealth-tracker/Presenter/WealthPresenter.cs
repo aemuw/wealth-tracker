@@ -48,7 +48,6 @@ namespace wealth_tracker.Presenter
             await _budgetService.LoadAsync();
 
             await ProcessRecurringTransactionsAsync();
-            await LoadSampleDataIfEmptyAsync();
             RefreshAll();
         }
 
@@ -149,7 +148,9 @@ namespace wealth_tracker.Presenter
 
         private void RefreshAll()
         {
-            var summary = _service.GetSummary();
+            decimal totalSaved = _savingsService.AllGoals.Sum(g => g.SavedAmount);
+
+            var summary = _service.GetSummary(totalSaved);
             _budgetService.RecalculateSpent(_service.AllTransactions);
 
             _view.ShowSummary(summary);
@@ -157,76 +158,13 @@ namespace wealth_tracker.Presenter
             _view.ShowTransactions(_service.GetFiltered(_currentFilter));
             _view.ShowPieChart(_service.GetExpensesByCategory());
             _view.ShowLineChart(_service.GetBalanceTimeline());
-            _view.ShowCombinedChart(_service.GetMonthlyChartData(), _service.GetForecastPoint());
+
+            _view.ShowCombinedChart(_service.GetMonthlyChartData(), _service.GetForecastPoint(totalSaved));
             _view.ShowSavingsChart(_savingsService.AllGoals);
-            _view.ShowForecast(_service.GetMonthlyForecast());
+            _view.ShowForecast(_service.GetMonthlyForecast(totalSaved));
+
             _view.ShowSavingsGoals(_savingsService.AllGoals);
             _view.ShowBudgetLimits(_budgetService.GetCurrentMonth());
-        }
-
-        private async Task LoadSampleDataIfEmptyAsync()
-        {
-            if (_service.GetSummary().TransactionCount > 0)
-                return;
-
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now.AddDays(-10),
-                Category = "Зарплата",
-                Amount = 15000,
-                Type = TransactionType.Income
-            });
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now.AddDays(-9),
-                Category = "Їжа",
-                Amount = 450,
-                Type = TransactionType.Expense
-            });
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now.AddDays(-7),
-                Category = "Транспорт",
-                Amount = 200,
-                Type = TransactionType.Expense
-            });
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now.AddDays(-5),
-                Category = "Комунальні",
-                Amount = 800,
-                Type = TransactionType.Expense
-            });
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now.AddDays(-4),
-                Category = "Розваги",
-                Amount = 350,
-                Type = TransactionType.Expense
-            });
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now.AddDays(-2),
-                Category = "Фріланс",
-                Amount = 3000,
-                Type = TransactionType.Income
-            });
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now.AddDays(-1),
-                Category = "Їжа",
-                Amount = 280,
-                Type = TransactionType.Expense
-            });
-            _service.Add(new Transaction
-            {
-                Date = DateTime.Now,
-                Category = "Здоров'я",
-                Amount = 500,
-                Type = TransactionType.Expense
-            });
-
-            await _persistence.SaveAllAsync(_service.AllTransactions);
         }
 
         private async void OnSavingsGoalAdd(object? sender, SavingsGoal goal)
@@ -324,11 +262,13 @@ namespace wealth_tracker.Presenter
 
             try
             {
+                decimal totalSaved = _savingsService.AllGoals.Sum(g => g.SavedAmount);
+
                 var reportService = new ReportService();
                 reportService.GeneratePdfReport(
-                    _service.GetSummary(),
+                    _service.GetSummary(totalSaved), 
                     _service.AllTransactions,
-                    _service.GetMonthlyForecast(),
+                    _service.GetMonthlyForecast(totalSaved), 
                     _savingsService.AllGoals,
                     _budgetService.GetCurrentMonth(),
                     path);

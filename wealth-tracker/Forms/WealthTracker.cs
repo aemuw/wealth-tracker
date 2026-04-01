@@ -36,6 +36,53 @@ namespace wealth_tracker
         public WealthTracker()
         {
             InitializeComponent();
+
+            if (chartPie == null)
+            {
+                chartPie = new System.Windows.Forms.DataVisualization.Charting.Chart();
+                ((System.ComponentModel.ISupportInitialize)(chartPie)).BeginInit();
+                chartPie.Location = new Point(10, 10);
+                chartPie.Name = "chartPie";
+                chartPie.Size = new Size(450, 450);
+                chartPie.TabStop = false;
+                if (tabPageAnalytics != null) tabPageAnalytics.Controls.Add(chartPie);
+                ((System.ComponentModel.ISupportInitialize)(chartPie)).EndInit();
+            }
+
+            if (chartLine == null)
+            {
+                chartLine = new System.Windows.Forms.DataVisualization.Charting.Chart();
+                ((System.ComponentModel.ISupportInitialize)(chartLine)).BeginInit();
+                chartLine.Location = new Point(470, 10);
+                chartLine.Name = "chartLine";
+                chartLine.Size = new Size(460, 450);
+                chartLine.TabStop = false;
+                if (tabPageAnalytics != null) tabPageAnalytics.Controls.Add(chartLine);
+                ((System.ComponentModel.ISupportInitialize)(chartLine)).EndInit();
+            }
+
+            dataGridViewSavings.Location = new Point(9, 102);
+            dataGridViewSavings.Size = new Size(560, 280);
+
+            if (chartSavings == null)
+            {
+                chartSavings = new System.Windows.Forms.DataVisualization.Charting.Chart();
+                ((System.ComponentModel.ISupportInitialize)(chartSavings)).BeginInit();
+
+                chartSavings.Location = new Point(580, 102);
+                chartSavings.Name = "chartSavings";
+                chartSavings.Size = new Size(365, 280);
+                chartSavings.TabStop = false;
+
+                if (tabPageSavings != null) tabPageSavings.Controls.Add(chartSavings);
+
+                ((System.ComponentModel.ISupportInitialize)(chartSavings)).EndInit();
+            }
+
+            int bottomY = 395;
+            groupBoxDeposit.Location = new Point(9, bottomY);
+            groupBox1.Location = new Point(315, bottomY);
+            groupBoxTransfer.Location = new Point(621, bottomY);
         }
 
         public void SetPresenter(WealthPresenter presenter)

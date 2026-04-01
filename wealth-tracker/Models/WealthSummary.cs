@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace wealth_tracker.Models
 {
@@ -20,9 +16,9 @@ namespace wealth_tracker.Models
             TotalIncome = totalIncome;
             TotalExpenses = totalExpenses;
             TransactionCount = count;
-        }    
+        }
 
-        public static WealthSummary Calculate(IEnumerable<Transaction> transactions)
+        public static WealthSummary Calculate(IEnumerable<Transaction> transactions, decimal totalSaved = 0)
         {
             var list = transactions.ToList();
             var income = list.Where(c => c.Type == TransactionType.Income).Sum(c => c.Amount);
@@ -30,7 +26,7 @@ namespace wealth_tracker.Models
 
             return new WealthSummary
             (
-                balance: income - expenses,
+                balance: income - expenses - totalSaved, 
                 totalIncome: income,
                 totalExpenses: expenses,
                 count: list.Count
