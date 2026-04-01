@@ -620,13 +620,45 @@ namespace wealth_tracker
             dataGridViewSavings.ColumnHeadersHeight = 40;
             dataGridViewSavings.RowTemplate.Height = 32;
 
-            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Назва", DataPropertyName = "Name" });
-            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Ціль (₴)", DataPropertyName = "TargetAmount", DefaultCellStyle = { Format = "N2" } });
-            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Накопичено (₴)", DataPropertyName = "SavedAmount", DefaultCellStyle = { Format = "N2" } });
-            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Прогрес (%)", DataPropertyName = "Progress", DefaultCellStyle = { Format = "F1" } });
-            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Внесок/міс (₴)", DataPropertyName = "MonthlyRequired", DefaultCellStyle = { Format = "N2" } });
-            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Дедлайн", DataPropertyName = "Deadline", DefaultCellStyle = { Format = "dd.MM.yyyy" } });
-            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Нотатка", DataPropertyName = "Note" });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                HeaderText = "Назва", 
+                DataPropertyName = "Name" 
+            });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                HeaderText = "Ціль (₴)", 
+                DataPropertyName = "TargetAmount", 
+                DefaultCellStyle = { Format = "N2" } 
+            });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn 
+            {
+                HeaderText = "Накопичено (₴)", 
+                DataPropertyName = "SavedAmount", 
+                DefaultCellStyle = { Format = "N2" } 
+            });
+            dataGridViewSavings.Columns.Add(new DataGridViewProgressColumn 
+            { 
+                HeaderText = "Прогрес (%)", 
+                DataPropertyName = "Progress" 
+            }); 
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                HeaderText = "Внесок/міс (₴)", 
+                DataPropertyName = "MonthlyRequired", 
+                DefaultCellStyle = { Format = "N2" } 
+            });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                HeaderText = "Дедлайн", 
+                DataPropertyName = "Deadline",
+                DefaultCellStyle = { Format = "dd.MM.yyyy" } 
+            });
+            dataGridViewSavings.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                HeaderText = "Нотатка",
+                DataPropertyName = "Note" 
+            });
         }
 
         private void InitializeBudgetGrid()
@@ -837,6 +869,57 @@ namespace wealth_tracker
                 var pForecastEnd = new DataPoint(xIndex, forecastBal);
                 pForecastEnd.AxisLabel = forecast.Label;
                 chartLine.Series["Прогноз"].Points.Add(pForecastEnd);
+            }
+        }
+    }
+
+    public class DataGridViewProgressColumn : DataGridViewImageColumn
+    {
+        public DataGridViewProgressColumn()
+        {
+            CellTemplate = new DataGridViewProgressCell();
+        }
+    }
+
+    public class DataGridViewProgressCell : DataGridViewImageCell
+    {
+        static Image emptyImage = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+        public DataGridViewProgressCell()
+        {
+            this.ValueType = typeof(decimal);
+        }
+
+        protected override object GetFormattedValue(object value, int rowIndex, ref DataGridViewCellStyle cellStyle, System.ComponentModel.TypeConverter valueTypeConverter, System.ComponentModel.TypeConverter formattedValueTypeConverter, DataGridViewDataErrorContexts context)
+        {
+            return emptyImage;
+        }
+
+        protected override void Paint(Graphics g, Rectangle clipBounds, Rectangle cellBounds, int rowIndex, DataGridViewElementStates elementState, object value, object formattedValue, string errorText, DataGridViewCellStyle cellStyle, DataGridViewAdvancedBorderStyle advancedBorderStyle, DataGridViewPaintParts paintParts)
+        {
+            base.Paint(g, clipBounds, cellBounds, rowIndex, elementState, value, formattedValue, errorText, cellStyle, advancedBorderStyle, paintParts);
+
+            if (value != null && decimal.TryParse(value.ToString(), out decimal progressVal))
+            {
+                float percentage = (float)progressVal;
+                if (percentage > 100) 
+                    percentage = 100;
+                if (percentage < 0) 
+                    percentage = 0;
+
+                g.FillRectangle(new SolidBrush(Color.FromArgb(236, 240, 241)), cellBounds.X + 2, cellBounds.Y + 5, cellBounds.Width - 5, cellBounds.Height - 10);
+
+                if (percentage > 0)
+                {
+                    int width = (int)((percentage / 100) * (cellBounds.Width - 5));
+                    Brush brush = new SolidBrush(Color.FromArgb(46, 204, 113)); 
+                    g.FillRectangle(brush, cellBounds.X + 2, cellBounds.Y + 5, width, cellBounds.Height - 10);
+                }
+
+                string text = percentage.ToString("F1") + "%";
+                SizeF textSize = g.MeasureString(text, cellStyle.Font);
+                PointF textLocation = new PointF(cellBounds.X + (cellBounds.Width - textSize.Width) / 2, cellBounds.Y + (cellBounds.Height - textSize.Height) / 2);
+                g.DrawString(text, cellStyle.Font, Brushes.Black, textLocation);
             }
         }
     }
