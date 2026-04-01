@@ -25,24 +25,24 @@ namespace wealth_tracker.Services
 
         public async Task AddAsync(SavingsGoal goal)
         {
-            if (goal == null) 
-                throw new ArgumentNullException(nameof(goal));
+            if (goal == null) throw new ArgumentNullException(nameof(goal));
             _context.SavingsGoals.Add(goal);
             await _context.SaveChangesAsync();
             _goals.Add(goal);
         }
 
+        // Видалення — БЕЗ фейкових транзакцій повернення
         public async Task DeleteAsync(Guid id)
         {
             var goal = _goals.FirstOrDefault(g => g.Id == id);
-            if (goal == null) 
-                return;
+            if (goal == null) return;
 
             _context.SavingsGoals.Remove(goal);
             await _context.SaveChangesAsync();
             _goals.Remove(goal);
         }
 
+        // Поповнення — тільки SavedAmount в БД, НЕ створює витратну транзакцію
         public async Task DepositAsync(Guid id, decimal amount)
         {
             if (amount <= 0)
@@ -64,6 +64,7 @@ namespace wealth_tracker.Services
             }
         }
 
+        // Переказ між цілями — без транзакцій
         public async Task TransferAsync(Guid fromId, Guid toId, decimal amount)
         {
             if (amount <= 0)

@@ -248,7 +248,7 @@ namespace wealth_tracker.Presenter
             try
             {
                 await _savingsService.DeleteAsync(id);
-                _view.ShowSuccess("Ціль видалено! Накопичені кошти повернуто на баланс.");
+                _view.ShowSuccess("Ціль видалено!");
                 RefreshAll();
             }
             catch (Exception ex)
