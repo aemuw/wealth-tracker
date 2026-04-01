@@ -14,7 +14,7 @@ The project demonstrates how a clean architecture can power a full-featured fina
 ![Savings Goals](screenshots/savings-page-ui.png)
 ![Budget](screenshots/budget-page-ui.png)
 ![Report](screenshots/report.png)
-![Swagger][screenshots/swagger.png]
+![Swagger](screenshots/swagger.png)
 
 ---
 
