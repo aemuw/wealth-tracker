@@ -80,20 +80,49 @@ namespace wealth_tracker.Services
             var now = DateTime.Now;
             var currentBalance = GetSummary(totalSaved).Balance;
 
-            var monthlyExpenses = _transactions
-                .Where(t => t.Type == TransactionType.Expense
-                         && t.Date.Month == now.Month
-                         && t.Date.Year == now.Year)
+            int daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
+            int daysPassed = now.Day;
+            int daysLeft = daysInMonth - daysPassed;
+
+            var currentMonthExpenses = _transactions
+                .Where(t => t.Type == TransactionType.Expense && t.Date.Month == now.Month && t.Date.Year == now.Year && t.Date <= now)
                 .Sum(t => t.Amount);
 
-            var daysPassed = now.Day;
             if (daysPassed == 0) 
                 return currentBalance;
 
-            var avgPerDay = monthlyExpenses / daysPassed;
-            var daysLeft = DateTime.DaysInMonth(now.Year, now.Month) - now.Day;
+            var pastMonthsExpenses = new List<decimal>();
+            for (int i = 1; i <= 3; i++)
+            {
+                var prevMonth = now.AddMonths(-i);
+                var sum = _transactions
+                    .Where(t => t.Type == TransactionType.Expense && t.Date.Month == prevMonth.Month && t.Date.Year == prevMonth.Year)
+                    .Sum(t => t.Amount);
 
-            return currentBalance - avgPerDay * daysLeft;
+                if (sum > 0) 
+                    pastMonthsExpenses.Add(sum);
+            }
+
+            decimal historicalMonthlyAvg = pastMonthsExpenses.Any()
+                ? pastMonthsExpenses.Average()
+                : (currentMonthExpenses / daysPassed) * daysInMonth;
+
+            decimal currentDailyAvg = currentMonthExpenses / daysPassed;
+            decimal projectedTotalByRunRate = currentMonthExpenses + (currentDailyAvg * daysLeft);
+
+            decimal projectedTotalByHistory = Math.Max(currentMonthExpenses, historicalMonthlyAvg);
+
+            decimal currentWeight = (decimal)daysPassed / daysInMonth;
+            decimal historyWeight = 1m - currentWeight;
+
+            decimal blendedProjectedTotalExpense = (projectedTotalByRunRate * currentWeight) + (projectedTotalByHistory * historyWeight);
+
+            decimal expectedRemainingExpenses = blendedProjectedTotalExpense - currentMonthExpenses;
+
+            if (expectedRemainingExpenses < 0)
+                expectedRemainingExpenses = 0;
+
+            return currentBalance - expectedRemainingExpenses;
         }
 
         public List<(string Label, decimal Income, decimal Expense, decimal Balance)> GetMonthlyChartData(decimal totalSaved = 0)
