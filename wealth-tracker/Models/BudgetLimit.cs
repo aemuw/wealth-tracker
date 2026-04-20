@@ -6,6 +6,7 @@ namespace wealth_tracker.Models
     public class BudgetLimit
     {
         public Guid Id { get; init; } = Guid.NewGuid();
+        public Guid UserId { get; set; }
 
         [Required]
         public string Category { get; set; } = string.Empty;
