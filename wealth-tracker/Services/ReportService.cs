@@ -116,7 +116,8 @@ namespace wealth_tracker.Services
                                     table.Cell().Padding(4).Text($"{g.TargetAmount:N2} ₴");
                                     table.Cell().Padding(4).Text($"{g.SavedAmount:N2} ₴").FontColor(color);
                                     table.Cell().Padding(4).Text($"{g.Progress:F0}%").FontColor(color);
-                                    table.Cell().Padding(4).Text(g.Deadline.ToString("dd.MM.yyyy"));
+                                    table.Cell().Padding(4).Text(g.TargetDisplay);
+                                    table.Cell().Padding(4).Text(g.DeadlineDisplay);
                                 }
                             });
                         }

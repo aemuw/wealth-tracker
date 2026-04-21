@@ -30,6 +30,7 @@ namespace wealth_tracker.Models
         
 
         public Guid Id { get; init; } = Guid.NewGuid();
+        public Guid UserId { get; set; }
 
         [Required]
         public DateTime Date
