@@ -12,13 +12,18 @@ namespace wealth_tracker.Services
     {
         private readonly BindingList<Transaction> _transactions = new BindingList<Transaction>();
 
+        public Guid CurrentUserId { get; set; }
+        public void SetUser(Guid userId) => CurrentUserId = userId;
         public IBindingList Transactions => _transactions;
-        public IEnumerable<Transaction> AllTransactions => _transactions;
-
+        public IReadOnlyList<Transaction> AllTransactions =>
+            _transactions.Where(t => t.UserId == CurrentUserId).ToList();
+        
         public void Add(Transaction transaction)
         {
             if (transaction == null)
                 throw new ArgumentNullException(nameof(transaction));
+            if (transaction.UserId == Guid.Empty)
+                transaction.UserId = CurrentUserId;
             _transactions.Add(transaction);
         }
 

@@ -11,10 +11,16 @@ namespace wealth_tracker.Presenter
         private readonly SavingsGoalService _savingsService;
         private readonly BudgetService _budgetService;
         private readonly ExportService _export = new ExportService();
+        private readonly UserService _userService;
 
         private TransactionFilter _currentFilter = new TransactionFilter();
 
-        public WealthPresenter(IWealthView view, TransactionService service, IPersistenceService persistence, SavingsGoalService savingsService, BudgetService budgetService)
+        public WealthPresenter(IWealthView view,
+            TransactionService service,
+            IPersistenceService persistence,
+            SavingsGoalService savingsService,
+            BudgetService budgetService,
+            UserService userService)
         {
             _view = view;
             _service = service;
@@ -36,10 +42,17 @@ namespace wealth_tracker.Presenter
             _view.BudgetLimitDeleteRequested += OnBudgetLimitDelete;
             _view.SavingsTransferRequested += OnSavingsTransfer;
             _view.ReportRequest += OnReportRequest;
+
+            _userService = userService;
         }
 
         public async Task InitializeAsync()
         {
+            var userId = _userService.CurrentUser!.Id;
+            _service.SetUser(userId);
+            _savingsService.SetUser(userId);
+            _budgetService.SetUser(userId);
+
             var saved = await _persistence.LoadAsync();
             foreach (var t in saved)
                 _service.Add(t);
@@ -47,8 +60,30 @@ namespace wealth_tracker.Presenter
             await _savingsService.LoadAsync();
             await _budgetService.LoadAsync();
 
+            var income = _service.GetSummary().TotalIncome;
+            await _savingsService.ProcessAutoSaveAsync(income);
+
             await ProcessRecurringTransactionsAsync();
+            await LoadSampleDataIfEmptyAsync();
             RefreshAll();
+        }
+
+        private async Task LoadSampleDataIfEmptyAsync()
+        {
+            if (_service.AllTransactions.Any())
+                return;
+
+            var sampleTransaction = new Transaction
+            {
+                Date = DateTime.Now,
+                Category = "Зарплата",
+                Amount = 15000,
+                Type = TransactionType.Income, 
+                Note = "Початковий баланс"
+            };
+
+            _service.Add(sampleTransaction);
+            await _persistence.SaveAsync(sampleTransaction);
         }
 
         private async Task ProcessRecurringTransactionsAsync()

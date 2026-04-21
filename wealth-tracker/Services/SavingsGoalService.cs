@@ -8,9 +8,11 @@ namespace wealth_tracker.Services
     {
         private readonly AppDbContext _context;
         private readonly List<SavingsGoal> _goals = new();
+        public Guid CurrentUserId { get; set; }
+        public void SetUser(Guid userId) => CurrentUserId = userId;
 
-        public IReadOnlyList<SavingsGoal> AllGoals => _goals;
-
+        public IReadOnlyList<SavingsGoal> AllGoals => 
+            _goals.Where(g => g.UserId == CurrentUserId).ToList(); 
         public SavingsGoalService(AppDbContext context)
         {
             _context = context;
@@ -27,6 +29,8 @@ namespace wealth_tracker.Services
         {
             if (goal == null) 
                 throw new ArgumentNullException(nameof(goal));
+            if (goal.UserId == Guid.Empty)
+                goal.UserId = CurrentUserId;
             _context.SavingsGoals.Add(goal);
             await _context.SaveChangesAsync();
             _goals.Add(goal);
@@ -91,6 +95,41 @@ namespace wealth_tracker.Services
             if (dbTo != null) dbTo.SavedAmount = to.SavedAmount;
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task ProcessAutoSaveAsync(decimal monthlyIncome)
+        {
+            var now = DateTime.Now;
+            var autoGoals = _goals.Where(g =>
+                g.UserId == CurrentUserId &&
+                g.AutoSave &&
+                (g.LastAutoSaveDate == null ||
+                 g.LastAutoSaveDate.Value.Month != now.Month ||
+                 g.LastAutoSaveDate.Value.Year != now.Year)).ToList();
+
+            foreach (var goal in autoGoals)
+            {
+                decimal amount = 0;
+                if (goal.AutoSaveAmount.HasValue && goal.AutoSaveAmount > 0)
+                    amount = goal.AutoSaveAmount.Value;
+                else if (goal.AutoSavePercent.HasValue && goal.AutoSavePercent > 0)
+                    amount = Math.Round(monthlyIncome * goal.AutoSavePercent.Value / 100, 2);
+
+                if (amount <= 0 || goal.IsCompleted) 
+                    continue;
+
+                goal.SavedAmount += amount;
+                goal.LastAutoSaveDate = now;
+
+                var dbGoal = await _context.SavingsGoals.FindAsync(goal.Id);
+                if (dbGoal != null)
+                {
+                    dbGoal.SavedAmount = goal.SavedAmount;
+                    dbGoal.LastAutoSaveDate = goal.LastAutoSaveDate;
+                }
+            }
+            if (autoGoals.Any()) 
+                await _context.SaveChangesAsync();
         }
     }
 }

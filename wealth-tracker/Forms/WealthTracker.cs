@@ -1,12 +1,16 @@
 using System.Windows.Forms.DataVisualization.Charting;
+using wealth_tracker.Forms;
 using wealth_tracker.Models;
 using wealth_tracker.Presenter;
+using wealth_tracker.Services;
 
 namespace wealth_tracker
 {
     public partial class WealthTracker : Form, IWealthView
     {
         private WealthPresenter? _presenter;
+        private Button? btnAdmin;
+        private UserService? _userServiceRef;
 
         public event EventHandler<Transaction> TransactionAddRequested = delegate { };
         public event EventHandler<Guid> TransactionDeleteRequested = delegate { };
@@ -45,7 +49,8 @@ namespace wealth_tracker
                 chartPie.Name = "chartPie";
                 chartPie.Size = new Size(450, 450);
                 chartPie.TabStop = false;
-                if (tabPageAnalytics != null) tabPageAnalytics.Controls.Add(chartPie);
+                if (tabPageAnalytics != null) 
+                    tabPageAnalytics.Controls.Add(chartPie);
                 ((System.ComponentModel.ISupportInitialize)(chartPie)).EndInit();
             }
 
@@ -57,7 +62,8 @@ namespace wealth_tracker
                 chartLine.Name = "chartLine";
                 chartLine.Size = new Size(460, 450);
                 chartLine.TabStop = false;
-                if (tabPageAnalytics != null) tabPageAnalytics.Controls.Add(chartLine);
+                if (tabPageAnalytics != null) 
+                    tabPageAnalytics.Controls.Add(chartLine);
                 ((System.ComponentModel.ISupportInitialize)(chartLine)).EndInit();
             }
 
@@ -74,7 +80,8 @@ namespace wealth_tracker
                 chartSavings.Size = new Size(365, 280);
                 chartSavings.TabStop = false;
 
-                if (tabPageSavings != null) tabPageSavings.Controls.Add(chartSavings);
+                if (tabPageSavings != null) 
+                    tabPageSavings.Controls.Add(chartSavings);
 
                 ((System.ComponentModel.ISupportInitialize)(chartSavings)).EndInit();
             }
@@ -83,6 +90,35 @@ namespace wealth_tracker
             groupBoxDeposit.Location = new Point(9, bottomY);
             groupBox1.Location = new Point(315, bottomY);
             groupBoxTransfer.Location = new Point(621, bottomY);
+        }
+
+        public void SetUserService(UserService userService)
+        {
+            _userServiceRef = userService;
+
+            if (userService.IsAdmin || userService.IsParent)
+            {
+                btnAdmin = new Button
+                {
+                    Text = "Адміністрування",
+                    Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                    BackColor = Color.FromArgb(52, 73, 94),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Size = new Size(180, 30),
+                    Dock = DockStyle.Right,
+                    Cursor = Cursors.Hand
+                };
+                btnAdmin.FlatAppearance.BorderSize = 0;
+                btnAdmin.Click += (s, e) =>
+                {
+                    using var adminForm = new AdminForm(_userServiceRef);
+                    adminForm.ShowDialog(this);
+                };
+                Controls.Add(btnAdmin);
+                btnAdmin.BringToFront();
+            }
+            Text = $"WealthTracker — {userService.CurrentUser?.Username} ({userService.CurrentUser?.Role})";
         }
 
         public void SetPresenter(WealthPresenter presenter)

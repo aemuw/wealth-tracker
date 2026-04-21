@@ -6,6 +6,9 @@ namespace wealth_tracker.Services
 {
     public class BudgetService
     {
+        public Guid CurrentUserId { get; set; }
+        public void SetUser(Guid userId) => CurrentUserId = userId;
+
         private readonly AppDbContext _context;
         private readonly List<BudgetLimit> _limits = new();  
 
@@ -64,7 +67,7 @@ namespace wealth_tracker.Services
 
         public void RecalculateSpent(IEnumerable<Transaction> transactions)
         {
-            foreach (var limit in _limits)
+            foreach (var limit in _limits.Where(l => l.UserId == CurrentUserId))
             {
                 limit.SpentAmount = transactions
                     .Where(t =>
@@ -79,9 +82,9 @@ namespace wealth_tracker.Services
         public List<BudgetLimit> GetCurrentMonth()
         {
             return _limits
-                .Where(l => 
-                l.Month == DateTime.Now.Month && 
-                l.Year == DateTime.Now.Year)
+                .Where(l => l.UserId == CurrentUserId &&
+                    l.Month == DateTime.Now.Month &&
+                    l.Year == DateTime.Now.Year)
                 .ToList();
         }
     }
