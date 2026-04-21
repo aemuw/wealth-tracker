@@ -23,7 +23,7 @@ namespace wealth_tracker.Forms
         private void SetupUI()
         {
             Text = "Вхід";
-            ClientSize = new Size(400, 400);
+            ClientSize = new Size(400, 420);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;

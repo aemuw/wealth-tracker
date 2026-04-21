@@ -95,6 +95,7 @@ namespace wealth_tracker
         public void SetUserService(UserService userService)
         {
             _userServiceRef = userService;
+            Text = $"WealthTracker — {userService.CurrentUser?.Username} ({userService.CurrentUser?.Role})";
 
             if (userService.IsAdmin || userService.IsParent)
             {
@@ -105,8 +106,10 @@ namespace wealth_tracker
                     BackColor = Color.FromArgb(52, 73, 94),
                     ForeColor = Color.White,
                     FlatStyle = FlatStyle.Flat,
-                    Size = new Size(180, 30),
-                    Dock = DockStyle.Right,
+                    Size = new Size(180, 28),
+
+                    Location = new Point(tabPageDashboard.ClientSize.Width - 200, tabPageDashboard.ClientSize.Height - 45),
+                    Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
                     Cursor = Cursors.Hand
                 };
                 btnAdmin.FlatAppearance.BorderSize = 0;
@@ -115,10 +118,10 @@ namespace wealth_tracker
                     using var adminForm = new AdminForm(_userServiceRef);
                     adminForm.ShowDialog(this);
                 };
-                Controls.Add(btnAdmin);
+
+                tabPageDashboard.Controls.Add(btnAdmin);
                 btnAdmin.BringToFront();
             }
-            Text = $"WealthTracker — {userService.CurrentUser?.Username} ({userService.CurrentUser?.Role})";
         }
 
         public void SetPresenter(WealthPresenter presenter)
