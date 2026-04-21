@@ -1,6 +1,6 @@
 ﻿namespace wealth_tracker.Forms
 {
-    partial class LoginForm
+    partial class AdminForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,16 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SuspendLayout();
-            // 
-            // LoginForm
-            // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 390);
-            Name = "LoginForm";
-            Text = "LoginForm";
-            ResumeLayout(false);
+            this.components = new System.ComponentModel.Container();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Text = "AdminForm";
         }
 
         #endregion
