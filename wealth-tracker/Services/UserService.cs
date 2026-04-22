@@ -12,7 +12,7 @@ namespace wealth_tracker.Services
         public AppUser? CurrentUser { get; private set; }
         public bool IsLoggedIn => CurrentUser != null;
         public bool IsAdmin => CurrentUser?.Role == UserRole.Admin;
-        public bool IsParent => CurrentUser?.Role is UserRole.Admin;
+        public bool IsParent => CurrentUser?.Role is UserRole.Admin or UserRole.Parent;
 
         public UserService(AppDbContext context)
         {
