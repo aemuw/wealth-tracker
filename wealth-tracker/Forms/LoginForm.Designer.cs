@@ -32,8 +32,8 @@
             // 
             // LoginForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(684, 390);
             Name = "LoginForm";
             Text = "LoginForm";

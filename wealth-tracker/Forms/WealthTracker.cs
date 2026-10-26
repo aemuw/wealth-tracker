@@ -68,7 +68,7 @@ namespace wealth_tracker
             }
 
             dataGridViewSavings.Location = new Point(9, 102);
-            dataGridViewSavings.Size = new Size(560, 280);
+            dataGridViewSavings.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             if (chartSavings == null)
             {
@@ -207,7 +207,7 @@ namespace wealth_tracker
             foreach (var g in goals)
             {
                 chartSavings.Series["Накопичено"].Points.AddXY(g.Name, (double)g.SavedAmount);
-                chartSavings.Series["Ціль"].Points.AddXY(g.Name, (double)g.TargetAmount);
+                chartSavings.Series["Ціль"].Points.AddXY(g.Name, (double)(g.TargetAmount ?? 0));
             }
         }
 
@@ -452,6 +452,8 @@ namespace wealth_tracker
                 DataPropertyName = "IsRecurring",
                 Width = 100
             });
+            dataGridViewTransactions.Anchor = AnchorStyles.Top | AnchorStyles.Bottom
+                                 | AnchorStyles.Left | AnchorStyles.Right;
         }
 
         private void InitializePieChart()
@@ -721,30 +723,31 @@ namespace wealth_tracker
         private void btnAddSavingsGoal_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBoxSavingsName.Text))
-            {
-                ShowError("Введіть назву цілі");
-                return; 
-            }
-
-            if (!decimal.TryParse(textBoxSavingsTarget.Text.Replace(",", "."),
-                System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out decimal target) || target <= 0)
             { 
-                ShowError("Введіть коректну суму цілі"); 
+                ShowError("Введіть назву цілі");
                 return;
             }
 
-            if (dateTimePickerSavingsDeadline.Value.Date <= DateTime.Now.Date.AddDays(1))
+            decimal? target = null;
+            if (!string.IsNullOrWhiteSpace(textBoxSavingsTarget.Text))
             {
-                ShowError("Дедлайн має бути не раніше ніж післязавтра");
-                return;
+                if (!decimal.TryParse(textBoxSavingsTarget.Text.Replace(",", "."),
+                    System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.InvariantCulture, out decimal t) || t <= 0)
+                { 
+                    ShowError("Введіть коректну суму або залиште порожнім"); 
+                    return; 
+                }
+                target = t;
             }
+
+            DateTime? deadline = dateTimePickerSavingsDeadline.Value; 
 
             SavingsGoalAddRequested.Invoke(this, new SavingsGoal
             {
                 Name = textBoxSavingsName.Text.Trim(),
                 TargetAmount = target,
-                Deadline = dateTimePickerSavingsDeadline.Value,
+                Deadline = deadline,
                 Note = string.IsNullOrWhiteSpace(textBoxSavingsNote.Text) ? null : textBoxSavingsNote.Text.Trim()
             });
 

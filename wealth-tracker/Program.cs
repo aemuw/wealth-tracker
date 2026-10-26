@@ -12,6 +12,7 @@ namespace wealth_tracker
         [STAThread]
         static async Task Main()
         {
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             ApplicationConfiguration.Initialize();
 
             var services = new ServiceCollection();
