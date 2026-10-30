@@ -22,7 +22,8 @@ namespace wealth_tracker.Data
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             if (!options.IsConfigured)
-                options.UseSqlite("Data Source=wealth-tracker.db");
+                options.UseSqlite(new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder
+                { DataSource = AppDataPaths.DatabasePath }.ToString());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -10,3 +10,6 @@ obj/
 *.db-wal
 transactions_*.json
 transactions_*.xml
+
+# Generated installation package and publication
+artifacts/
