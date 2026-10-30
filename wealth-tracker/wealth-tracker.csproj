@@ -50,4 +50,7 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="docs\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

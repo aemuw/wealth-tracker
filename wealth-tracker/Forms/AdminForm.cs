@@ -16,6 +16,13 @@ namespace wealth_tracker.Forms
         {
             _userService = userService;
             SetupUI();
+            txtNewUsername.Name = nameof(txtNewUsername);
+            txtNewPassword.Name = nameof(txtNewPassword);
+            txtNewPwd.Name = nameof(txtNewPwd);
+            txtChangeMyPwd.Name = nameof(txtChangeMyPwd);
+            cmbRole.Name = nameof(cmbRole);
+            cmbParent.Name = nameof(cmbParent);
+            HelpService.Attach(this, "users", () => _userService.CurrentUser);
             _ = LoadUsersAsync();
         }
 

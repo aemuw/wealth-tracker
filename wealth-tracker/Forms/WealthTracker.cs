@@ -1,4 +1,4 @@
-using System.Windows.Forms.DataVisualization.Charting;
+﻿using System.Windows.Forms.DataVisualization.Charting;
 using wealth_tracker.Forms;
 using wealth_tracker.Models;
 using wealth_tracker.Presenter;
@@ -90,6 +90,16 @@ namespace wealth_tracker
             groupBoxDeposit.Location = new Point(9, bottomY);
             groupBox1.Location = new Point(315, bottomY);
             groupBoxTransfer.Location = new Point(621, bottomY);
+            HelpService.Attach(this, "index", () => _userServiceRef?.CurrentUser, () =>
+                tabControlMain.SelectedTab?.Name switch
+                {
+                    "tabPageDashboard" => "transactions",
+                    "tabPageTransactions" => "transactions",
+                    "tabPageAnalytics" => "analytics",
+                    "tabPageSavings" => "savings",
+                    "tabPageBudget" => "budget",
+                    _ => "index"
+                });
         }
 
         public void SetUserService(UserService userService)

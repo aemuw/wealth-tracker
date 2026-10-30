@@ -18,6 +18,9 @@ namespace wealth_tracker.Forms
         {
             _userService = userService;
             SetupUI();
+            textBoxUsername.Name = nameof(textBoxUsername);
+            textBoxPassword.Name = nameof(textBoxPassword);
+            HelpService.Attach(this, "login");
         }
 
         private void SetupUI()
